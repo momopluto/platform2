@@ -1,0 +1,39 @@
+<!DOCTYPE THML>
+<html>
+	<head>
+		<?php $SRC = CLIENT_SRC; ?>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+		<link rel="stylesheet" type="text/css" href="{$SRC}/css/global.css">
+		<link rel="stylesheet" type="text/css" href="{$SRC}/css/lists.css">
+		<script type="text/javascript" src="{$SRC}/scripts/jquery-1.8.3.min.js"></script>
+		<title><?php echo PLTF_NAME;?></title>
+		
+		<script type="text/javascript">
+			$(document).ready(function() {
+		        var $body_height=$(window).height();
+		        var $body_width=$("body").width();
+		        var $left=($body_width-220)/2;
+		        var $top=($body_height-220)/2;
+		        $(".order_done_content").css("left",$left);
+		        $(".order_done_content").css("top",$top);
+		    });
+		</script>
+	 
+	</head>
+	<body class="order_done_body">
+		<header>
+	      <p class="headerCenter">下单成功</p>
+      	</header>
+      	<div class="order_done_content">
+      		<div class="success_img"></div>
+			<p>订单已提交</p>
+			<div class="order_done_operate">
+				<div>
+					<a href="{:U('Client/Restaurant/lists')}"><button class="order_done continue">继续订餐</button></a>
+					<a href="{:U('Client/Order/myOrder')}"><button class="order_done">查看订单</button></a>
+				</div>
+			</div>
+		</div>
+	</body>
+</html>

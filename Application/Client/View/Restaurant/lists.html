@@ -1,0 +1,138 @@
+<!DOCTYPE HTML>
+<html>
+	<head>
+		<?php $SRC = CLIENT_SRC; ?>
+		
+		<title><?php echo PLTF_NAME;?></title>
+	  	<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+		<link rel="stylesheet" type="text/css" href="{$SRC}/css/menu.css">
+		<link rel="stylesheet" type="text/css" href="{$SRC}/css/global.css">
+		<script type="text/javascript" src="{$SRC}/scripts/jquery-1.8.3.min.js"></script>
+		<script type="text/javascript" src="{$SRC}/scripts/jquery.cookie.js"></script>
+	  	<link rel="stylesheet" type="text/css" href="{$SRC}/css/lists.css">
+	  	<script type="text/javascript" src="{$SRC}/scripts/lists.js"></script>
+	</head>
+		<body>
+			<header>
+			<div class="return" id="menu" href="#" ></div> 
+			<p class="headerCenter">华南农业大学[西门]</p>
+			<a href="#" class="changeCity">[切换]</a>
+			
+			</header>
+			<div class="login-panel">
+				<div class="login">
+					<ul class="loginList">
+						<li class="li-loginImg"><a href="#"><img class="loginImg" width='50px' height='50px' src="{$SRC}/images/hall.png"><p class="textItem"><span class="loginItem">登录</span>/<span class="registerItem">注册</span></p>
+						<div class="clear"></div></a></li>
+						<li><a href="{:U('Client/Restaurant/lists')}"><img class="imgItem" src="{$SRC}/images/hall.png"><span>选择餐厅</span></a></li>
+						<li><a href="{:U('Client/Order/myOrder')}"><img class="imgItem" src="{$SRC}/images/hall.png"><span>我的订单</span></a></li>
+					</ul>
+				</div>
+			</div>
+
+			<!-- 列表项 -->
+			<ul class="listHall">
+				<foreach name="open_rsts" item="one_rst">
+					<li class="listHallItem">
+						<form action="{:U('Client/Order/menu')}" method="post">
+						    <a href="#" class="hallHref">
+							<img class="hallimg" width="42" height="42" src="{$one_rst['logo_url']}">
+							<div class="halltext">
+								<p class="caption">{$one_rst['rst_name']}<!-- <span class="new">新</span> --></p>
+								<if condition="$one_rst['open_status'] % 10 != 4">
+									<p class="accept">接受预定{$one_rst['open_status']}</p>
+								</if>
+								<p class="describe">月售<span class="count">{$one_rst['month_sale']}</span>单/<span class="prePrice">{$one_rst['rst_agent_fee']}</span>元起送/<span class="sendTime">
+									<if condition="$one_rst['open_status'] == '0' || $one_rst['open_status'] == '1'">{$one_rst['stime_1_open']}
+										<elseif condition="$one_rst['open_status'] == '2' || $one_rst['open_status'] == '12'"/>{$one_rst['stime_2_open']}
+										<elseif condition="$one_rst['open_status'] == '3' || $one_rst['open_status'] == '23'"/>{$one_rst['stime_3_open']}
+									</if>
+								</span>开始营业</p>
+							    <!-- <p class="onePrice"><span class="redOne">1</span>1元抢购-GZ</p>
+							    <p class="online onePrice"><span class="sub">减</span>在线支付优惠</p> -->
+							</div>
+							<div class="clear"></div>
+							</a>
+							<div class="clear"></div>
+
+							<input type="hidden" name="rid" value="<?php echo 10086 * $one_rst['rid'];?>">
+
+						</form>
+					</li>
+				</foreach>
+		<!-- ============================================================================================== -->
+					<!-- <li class="listHallItem">
+						<form action="{:U('Client/Order/menu')}" method="post">
+						    <a href="#" class="hallHref">
+							<img class="hallimg" width="42" height="42" src="{$SRC}/images/hall.png">
+							<div class="halltext">
+								<p class="caption">【减】肠粉店<span class="new">新</span></p>
+								<p class="accept">接受预定</p>
+								<p class="describe">月售<span class="count">1512</span>单/<span class="prePrice">10</span>元起送/<span class="sendTime">09:30</span>开始营业</p>
+							    <p class="onePrice"><span class="redOne">1</span>1元抢购-GZ</p>
+							    <p class="online onePrice"><span class="sub">减</span>在线支付优惠</p>
+							</div>
+							<div class="clear"></div>
+							</a>
+							<div class="clear"></div>
+							<input type="hidden" name="aaa" value="111">
+						</form>
+					</li> -->
+		<!-- ============================================================================================== -->
+			</ul>
+			<ul class="gray listHall">
+				<foreach name="close_rsts" item="one_rst">
+					<li class="listHallItem">
+						<form action="{:U('Client/Order/menu')}" method="post">
+						    <a href="#" class="hallHref">
+							<img class="hallimg" width="42" height="42" src="{$one_rst['logo_url']}">
+							<div class="halltext">
+								<p class="caption">{$one_rst['rst_name']}<!-- <span class="new">新</span> --></p>
+								<if condition="$one_rst['open_status'] % 10 != 4">
+
+									<p class="accept">接受预定</p>
+								</if>
+								<p class="describe">月售<span class="count">{$one_rst['month_sale']}</span>单/<span class="prePrice">{$one_rst['rst_agent_fee']}</span>元起送/<span class="sendTime">
+									<if condition="$one_rst['open_status'] == 0 || $one_rst['open_status'] == 1">{$one_rst['stime_1_open']}
+										<elseif condition="$one_rst['open_status'] == 2 || $one_rst['open_status'] == 12"/>{$one_rst['stime_2_open']}
+										<elseif condition="$one_rst['open_status'] == 3 || $one_rst['open_status'] == 23"/>{$one_rst['stime_3_open']}
+									</if>
+								</span>开始营业</p>
+							    <!-- <p class="onePrice"><span class="redOne">1</span>1元抢购-GZ</p>
+							    <p class="online onePrice"><span class="sub">减</span>在线支付优惠</p> -->
+							
+							</div>
+							<div class="clear"></div>
+							</a>
+							<div class="clear"></div>
+
+							<input type="hidden" name="rid" value="<?php echo 10086 * $one_rst['rid'];?>">
+
+						</form>
+					</li>
+				</foreach>
+		<!-- ============================================================================================== -->
+					<!-- <li class="listHallItem">
+						<form action="{:U('Client/Order/menu')}" method="post">
+						    <a href="#" class="hallHref">
+							<img class="hallimg" width="42" height="42" src="{$SRC}/images/hall.png">
+							<div class="halltext">
+								<p class="caption">【减】肠粉店<span class="new">新</span></p>
+								<p class="accept">接受预定</p>
+								<p class="describe">月售<span class="count">1512</span>单/<span class="prePrice">10</span>元起送/<span class="sendTime">09:30</span>开始营业</p>
+							    <p class="onePrice"><span class="redOne">1</span>1元抢购-GZ</p>
+							    <p class="online onePrice"><span class="sub">减</span>在线支付优惠</p>
+							</div>
+							<div class="clear"></div>
+							</a>
+							<div class="clear"></div>
+							<input type="hidden" name="bbb" value="222">
+						</form>
+					</li> -->
+		<!-- ============================================================================================== -->
+			</ul>
+		
+
+	</body>
+</html>

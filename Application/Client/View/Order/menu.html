@@ -1,0 +1,72 @@
+<!DOCTYPE HTML>
+<html>
+	<head>
+	<title><?php echo PLTF_NAME;?></title>
+		<?php $SRC = CLIENT_SRC; ?>
+		
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+		<link rel="stylesheet" type="text/css" href="{$SRC}/css/menu.css">
+		<link rel="stylesheet" type="text/css" href="{$SRC}/css/global.css">
+		<script type="text/javascript" src="{$SRC}/scripts/jquery-1.8.3.min.js"></script>
+		<script type="text/javascript" src="{$SRC}/scripts/jquery.cookie.js"></script>
+
+		<link rel="stylesheet" type="text/css" href="{$SRC}/css/gouwuche.css">
+		<script type="text/javascript" src="{$SRC}/scripts/gouwuche.js"></script>
+		
+	</head>
+
+	<body>
+		<header><a class="return" href="javascript:window.history.go(-1)">&lt;返回</a><a href="{:U('Client/Restaurant/info')}" shape="poly" class="headerCenter"><span>{$rst['rst_name']}</span></a></header>
+		
+			<p id="restState">本餐厅暂不接受订餐</p>
+		<div class="menu">
+			<ul class="menuList">
+
+				<foreach name="data" item="one_menu">
+					<if condition="$one_menu['pid'] != 0 ">
+						<li class="menuListItem">
+							<div class="describeItem">
+								<p class="menuName" >{$one_menu['name']}</p>
+								<input type="hidden" class="menuNameforID" value="{$one_menu['id']}">
+								<div class="menuNumber">
+									<img src="{$SRC}/images/star.jpg">
+									<span>月售<span class="red">{$one_menu['month_sale']}</span>份</span>
+								</div>
+								<p class="side_dish">{$one_menu['description']}</p>
+								<div class="additional">
+									<span class="zhaopai">招牌</span>
+									<span class="xin" >新</span>
+								</div>
+							</div>
+							<div class="btnPrice">
+								<p class="btnSub">-</p>
+								<p class="price">￥{$one_menu['price']}</p>
+							</div>
+						</li>
+					</if>
+				</foreach>
+
+			</ul>
+
+		
+			<div id="gouwuche">
+			   
+			    <a href="" id="formSubmit">
+			   <div class="countHeader">
+			  
+			   	<img src="{$SRC}/images/gouwuche.png" id="gouwucheImg">
+			   	<p class="total">共<span class="account_menu">0</span>份&nbsp;<span class="total_price">￥0</span>元</p>
+			   	<p class="shortcComing">还差&nbsp;￥<span>{$rst['rst_agent_fee']}</span>元&nbsp;起送</p>
+			
+				<p class="jiesuan">去结算</p>
+				
+			   </div>
+				</a>
+				
+				<form id="myForm" action="{:U('Client/Order/cart')}" method="post">
+				</form>
+			</div>
+		</div>
+	</body>
+</html>

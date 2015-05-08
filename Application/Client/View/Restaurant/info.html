@@ -1,0 +1,55 @@
+<!DOCTYPE HTML>
+<html>
+	<head>
+		<?php $SRC = CLIENT_SRC; ?>
+		<meta charset="utf-8">
+	    <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+		
+		<link rel="stylesheet" type="text/css" href="{$SRC}/css/global.css">
+		<link rel="stylesheet" type="text/css" href="{$SRC}/css/info.css">
+	
+		<script type="text/javascript" src="{$SRC}/scripts/jquery.js"></script>
+	
+		<title><?php echo PLTF_NAME;?></title>
+	</head>
+		<body>
+			<header><a class="return" href="javascript:window.history.go(-1)"><返回</a>餐厅介绍</header>
+			<div class="hallItem" id="hallHeader">
+				<div class="logo">
+					<img width="42px" height="42px" src="{$data['logo_url']}">
+					<h3 class="hallName">{$data['rst_name']}</h3>
+					<!-- <p class="hallNote">饮料、奶茶</p> -->
+				</div>
+				<div class="hallEvaluate">
+					<div id="first">
+						<p class="grades">4.6分</p>
+						<p class="units">用户评分</p>
+					</div>
+					<div>
+						<p class="grades">40</p>
+						<p class="units">送达/分钟</p>
+					</div>
+					<div>
+						<p class="grades">{$data['rst_agent_fee']}</p>
+						<p class="units">起送价/元</p>
+					</div>
+					<div>
+						<p class="grades">10</p>
+						<p class="units">配送费/元</p>
+					</div>
+				</div>
+			</div>
+			<div class="hallItem" id="hallPromotion">
+				<h3>餐厅公告</h3>
+				<p class="describe">{$data['rst_promotion_info']}</p>
+			</div>
+			<div class="hallItem" id="hallAddress">
+				<h3>餐厅地址</h3>
+				<p class="describe">{$data['rst_address']}</p>
+			</div>
+			<div class="hallItem" id="hallPhone">
+				<h3>餐厅电话</h3>
+				<p class="describe">{$data['rst_phone']}</p>
+			</div>
+	</body>
+</html>

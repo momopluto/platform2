@@ -1,0 +1,379 @@
+.login{
+	position: absolute;
+	top: 45px;
+	left: 0px;
+	z-index: 10;
+	background-color: rgb(46,46,46);
+	width: 80%;
+	bottom: 0;
+}
+.login-panel{
+	display: none;
+	z-index: 10;
+}
+
+.backDivstyle{
+	position: absolute;
+	height: 100%;
+	width: 100%;
+	background: #000;
+	background: #000000;
+	opacity: 0.6;
+	z-index: 9;
+	top: 45px;
+	left: 0;
+}
+
+.loginList li{
+	list-style: none;
+	border-bottom: 1px solid #292929;
+	padding: 5px 5px;
+	text-align: left;
+	line-height: 40px;
+}
+.li-loginImg{
+	height: 60px;
+}
+.loginImg{
+	border-radius: 50%;
+	float: left;
+	margin-right: 5px;
+}
+.textItem{
+	height: 43px;
+	line-height: 43px;
+	text-align: left;
+}
+
+.clear{
+	clear: both;
+	display: block;
+}
+
+.imgItem{
+	height: 20px;
+	width: 20px;
+	float: left;
+	margin-top: 7px;
+	margin-right: 5px;
+}
+.loginList a{
+	display: block;
+	text-decoration: none;
+	color: rgb(255,255,255);
+}
+
+.loginList li.li-loginImg a{
+	margin-top: 10px;
+}
+
+
+/*列表项*/
+.listHall{
+	margin-top: 45px;
+	position: relative;
+	z-index: 0;
+}
+
+.listHallItem{
+	list-style: none;
+	border-bottom: 1px solid rgb(224,224,224);
+
+}
+
+
+.hallHref{
+	display: block;
+	padding: 10px;
+	text-decoration: none;
+}
+
+
+.hallimg{
+	float: left;
+	margin-right: 10px;
+}
+
+.halltext{
+	float: left;
+	font-size: 12px;
+
+}
+
+.caption{
+	font-size: 14px;
+	color: rgb(0,0,0);
+	height: 30px;
+	line-height: 30px;
+}
+
+.new{
+	
+	padding: 3px;
+	background-color: rgb(255,96,0);
+	border-radius: 3px;
+	margin-left: 5px;
+	font-size: 12px;
+	color: rgb(255,255,255);
+}
+
+.accept{
+	height: 18px;
+	line-height: 18px;
+	background-color: rgb(75,212,95);
+	border-radius: 3px;
+	color: rgb(255,255,255);
+	margin-left: 3px;
+	width: 60px;
+	text-align: center;
+	
+}
+
+.clear{
+	display: block;
+	clear: both;
+}
+
+.describe{
+	height: 20px;
+	line-height: 20px;
+	color: rgb(102,102,102);
+	padding:0 0 5px 0; 
+	/*border-bottom: 1px solid rgb(235,235,235);*/
+}
+.onePrice{
+	height: 18px;
+	line-height: 18px;
+	color: rgb(102,102,102);
+}
+
+.sub,.redOne{
+	color: rgb(255,255,255);
+	padding: 2px;
+	border-radius: 3px;
+	background-color: rgb(130,120,47);
+	margin-right: 10px;
+	width: 30px;
+}
+.redOne{
+	padding: 2px 5px;
+	background-color: red;
+}
+
+
+/*订单中心*/
+
+.resturantList{
+	margin-top: 45px;
+	background-color: rgb(255,255,255);
+}
+.resturant_item{
+	list-style: none;
+	padding: 10px;
+	margin-top: 10px;
+	
+	background-color: rgb(255,255,255);
+	border-bottom: 1px solid rgb(180,180,180);
+	border-top: 1px solid rgb(180,180,180);
+}
+.resturant_itemforLi{
+	list-style: none;
+	padding: 5px 0 10px 5px;
+	background-color: rgb(255,255,255);
+	border-bottom: 1px solid rgb(180,180,180);
+	
+}
+
+.resturant_itemforLi:first-child{
+	margin-top: 10px;
+}
+
+.resturant_item a,.resturant_itemforLi a{
+	text-decoration: none;
+	background-color: rgb(255,255,255);
+}
+
+.AforStyle,.foodListforUl .foodListCount,.foodprice{
+    color: rgb(120,120,120);
+}
+.torder-rst>img{
+	width: 50px;
+	height: 50px;
+	float: left;
+	margin-right: 10px;
+
+}
+.resturant_itemforhead{
+	color: rgb(0,0,0);
+}
+.resturant_itemforhead a{
+	color: rgb(0,0,0);
+	text-decoration: none;
+}
+.resturantList a:hover{
+	color: rgb(224,143,40);
+}
+.torder-summary{
+	margin-top: 5px;
+	height: 50px;
+	padding: 0px 10px;
+}
+.resturant_itemfordate{
+	padding: 3px 10px;
+}
+.torder-status{
+	float: right;
+	color: rgb(224,143,40);
+}
+.clerify{
+	text-align: right;
+	font-weight: bolder;
+	font-size: 14px;
+	line-height: 20px;
+}
+.clerify .confirm{
+	color:rgb(75,212,95);
+}
+.clerify .unconfirm{
+	color:orange;
+}
+.clerify .invalid{
+	color:red;	
+}
+.torder-misc p{
+	height: 25px;
+	line-height: 25px;
+}
+.borderBo{
+	padding-bottom: 10px;
+	border-bottom: 1px solid rgb(180,180,180);
+}
+
+.outerConetent{
+	background-color: rgb(224,224,224);
+}
+/*.foodListforUl .foodList{
+	float: right;
+	width: 30%;
+	display: inline-block;
+}*/
+/*.itemforhead .foodList{
+	width: 35%;
+	float: right;
+	display: inline-block;
+}*/
+.foodListforUl li{
+	list-style: none;
+	display: block;
+}
+.foodListforUl li span{
+	line-height: 30px;
+}
+/*.foodListCount{
+	width: 40%;
+	display: inline-block;
+}
+*/
+.foodListforUl .AforStyle{
+	width: 70%;
+	display: inline-block;
+}
+.itemforhead{
+	margin-bottom: 5px;
+}
+.foodList_title{
+	width: 60%;
+	display: inline-block;
+}
+.itemforList li{
+	list-style: none;
+	height: 30px;
+	line-height: 30px;
+}
+
+div#menu{
+	width: 15px;
+	height: 8px;
+	border:2px solid #ffffff;
+	border-width: 2px 0;
+	margin-top: 16px;
+}
+div#menu:before{
+	content: "";
+	position: absolute;
+	top: 3px;
+	right: 0;
+	width: 100%;
+	height: 2px;
+	background: #ffffff;
+}
+
+/*done.html*/
+.order_done{
+	padding:0 5px;
+	line-height: 30px;
+	text-align: center;
+	width: 80px;
+	background-color: rgb(49,153,232);
+	color: rgb(255,255,255);
+	text-decoration: none;
+	font-weight: bolder;
+	font-size: 16px;
+	border: 0px;
+	border-radius: 3px;
+}
+.order_done_operate .continue{
+	margin-right: 30px;
+}
+
+.order_done_operate{
+	width: 198px;
+	margin: 0 auto;
+}
+.order_done_content{
+	position: absolute;
+	width: 220px;
+}
+.order_done_content p{
+	text-align: center;
+	margin: 20px 0;
+	width: 100%;
+	font-size: 20px;
+}
+
+.order_done_body{
+	background:rgb(242,242,242);
+}
+.success_img{
+	width: 60px;
+	height: 60px;
+	background: url(../images/success.png) center no-repeat;
+	background-size: 60px 60px;
+	margin:0 auto;
+}
+.itemforhead .foodList{
+	margin-right: 40px;
+}
+.foodList{
+	display: inline-block;
+	float: right;
+	margin-right: 30px;
+}
+.foodprice,.foodprice-title{
+	float: right;
+	text-align: left;
+	display: inline-block;
+	width: 15px;
+	height: 30px;
+	line-height: 30px;
+}
+
+.foodListCount{
+	float: left;
+	text-align: left;
+	width: 10px;
+	margin-right: 35px;
+	display: inline-block;
+	height: 30px;
+	line-height: 30px;
+}

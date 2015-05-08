@@ -1,0 +1,68 @@
+<!DOCTYPE THML>
+<html>
+	<head>
+		<?php $SRC = CLIENT_SRC; ?>
+		
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+
+		<title><?php echo PLTF_NAME;?></title>
+		<link rel="stylesheet" type="text/css" href="{$SRC}/css/gouwuchelist.css">
+		<link rel="stylesheet" type="text/css" href="{$SRC}/css/global.css">
+		<script type="text/javascript" src="{$SRC}/scripts/jquery-1.8.3.min.js"></script>
+		<script type="text/javascript" src="{$SRC}/scripts/jquery.cookie.js"></script>
+		<script type="text/javascript" src="{$SRC}/scripts/gouwuchelist.js"></script>
+
+		
+	</head>
+	<body>
+	
+	<header><a class="return" href="javascript:window.history.go(-1)">&lt;返回</a>订餐篮</header>
+		<div id="gouwuchelist">
+			<ul class="listUl">
+
+				<?php
+					$ck_data = json_decode(cookie('pltf_order_cookie'),true);
+					// p($ck_data);die;//gouwucheItemdata['item']
+					$all_count = 0;
+				?>
+
+				<!-- $ck_data为空时，调用js中showEmpty()方法 -->
+
+				<foreach name="ck_data['item']" item="one_item">
+					<li class="gouwucheItem" >
+					<input type="hidden" class="NameforID" value="{$one_item['entity_id']}">
+						<p class="ItemName">{$one_item['name']}</p>
+						<!-- <img src="{$SRC}/images/decline.png" class="deleteBtn"> -->
+						<div class="Item">
+							<p class="ItemCount">&times;<span class="inputCount">{$one_item['count']}</span></p>
+							<p class="ItemPrice">￥<span class="inputPrice">{$one_item['price']}</span></p>
+						</div>
+						<div class="clear"></div>
+                        
+                        <div class="deleteAndchange">
+                        	<img src="{$SRC}/images/delete.png" class="deleteBtn">
+                        	<div class="enter_product">
+                                <input type="button"  class="add_sub sub" value="-">
+                               	<input type="button"  class="add_sub add" value="+">                                	
+                        </div>
+                        </div>
+					</li>
+					<?php $all_count += $one_item['count'];?>
+				</foreach>
+				<p class="totalAllMenu"><span id="account">{$all_count}</span>份美食&nbsp;&nbsp;共<span id="total">{$ck_data['total']}</span>元</p>
+			</ul>
+
+			<a id="formSubmit2" href="#" class="footer">确认美食</a>
+			<form id="myForm2" action="{:U('Client/Order/delivery')}" method="post">
+				<!-- <input type="hidden" id="postData" value=""> -->
+				<!-- 无需post -->
+			</form>
+		</div>
+		<div class="empty">
+			<p>
+			   <img src="{$SRC}/images/empty.png">
+			</p>
+		</div>
+	</body>
+</html>
