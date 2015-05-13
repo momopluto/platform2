@@ -546,38 +546,12 @@ class OrderController extends ClientController {
             $r_ID = I('post.r_ID') / 10086;//简单加密的解密
             $rst = $this->update_curRstInfo($r_ID);// 获取餐厅信息，写入session和cookie
 
-/*  获取餐厅信息
-            // 得到r_ID餐厅信息
-            $rst = M('resturant','home_')->where("r_ID = $r_ID")->field('r_ID,logo_url,rst_name,isOpen,rst_is_bookable,rst_agent_fee,
-                stime_1_open,stime_1_close,stime_2_open,stime_2_close,stime_3_open,stime_3_close')->find();
-
-
-            if(is_null($rst)){
-
-                $this->error('Something Wrong！', U('Client/Restaurant/lists'));   
-            }
-
-
-            $rst = rstInfo_combine($rst);// 订餐页面所需要的餐厅的信息，组装
-
-            session('pltf2_curRst_info', $rst);//将当前选择的餐厅信息写入session
-
-            $rst['logo_url'] = urlencode($rst['logo_url']);//处理logo_url链接
-            $json_rst = json_encode($rst);
-            // p($rst);
-            // p($json_rst);die;
-            cookie("pltf2_curRst_info", urldecode($json_rst));//将当前选择的餐厅信息写入cookie
-
-            // p(session('pltf2_curRst_info'));die;
-*/
-
-            // $data = M('menu',$r_ID.'_')->select();
 
             $map['r_ID'] = $r_ID;
             $data = M('menu')->where($map)->select();
 
             // p($data);die;
-
+            // 判断来源是App则返回JSON数据
 
             $this->assign('data', $data);//菜单列表
             $this->assign('rst', $rst);//餐厅信息
@@ -614,7 +588,6 @@ class OrderController extends ClientController {
         // 过滤得到符合展示要求的餐厅
         $map['r_ID'] = $r_ID;
         $rst = $model->where($map)->find();
-
 
         if(is_null($rst)){
     //检错*********************************************

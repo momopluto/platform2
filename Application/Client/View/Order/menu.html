@@ -17,7 +17,7 @@
 	</head>
 
 	<body>
-		<header><a class="return" href="javascript:window.history.go(-1)">&lt;返回</a><a href="{:U('Client/Restaurant/info')}" shape="poly" class="headerCenter"><span>{$rst['name']}</span></a></header>
+		<header><a class="return" href="javascript:window.history.go(-1)">&lt;返回</a><a href="{:U('Client/Restaurant/info')}?r_ID=<?php echo 10086 * $rst['r_ID'];?>" shape="poly" class="headerCenter"><span>{$rst['name']}</span></a></header>
 		
 			<p id="restState">本餐厅暂不接受订餐</p>
 		<div class="menu">

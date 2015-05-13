@@ -60,7 +60,7 @@ class RestaurantController extends ClientController {
             if($an_rst['isOpen'] == "1"){//主观，营业
                 // echo $an_rst['open_status']."status！";die;
                 if(intval($an_rst['open_status']) % 10 == 4){//已过餐厅今天的所有营业时间
-                    // echo $an_rst['rid']."打烊了啊！";die;
+                    // echo $an_rst['r_ID']."打烊了啊！";die;
                     $close_rsts[$key] = $an_rst;
                 }else{
                     if($an_rst['is_bookable']){
@@ -330,16 +330,18 @@ class RestaurantController extends ClientController {
     // 餐厅信息
     function info(){
 
-        if(session('?pltf_curRst_info')){
+        if (!$r_ID = I('get.r_ID')) {
 
-            $curRst = session('pltf_curRst_info');
+            // r_ID为空
+            $this->error("Something wrong！");
+            return;
+        }
 
-            $rid = $curRst['rid'];
-            // echo "$rid";
-            $data = M('resturant', 'home_')->where("rid = $rid")->find();
-            if($data){
-                $this->assign('data',$data);
-            }
+        $map['r_ID'] = $r_ID / 10086;// 简单解密
+        $data = M('restaurant')->where($map)->find();
+        // p($data);die;
+        if($data){
+            $this->assign('data', $data);
         }
 
         $this->display();

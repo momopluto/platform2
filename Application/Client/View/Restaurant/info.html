@@ -17,7 +17,7 @@
 			<div class="hallItem" id="hallHeader">
 				<div class="logo">
 					<img width="42px" height="42px" src="{$data['logo_url']}">
-					<h3 class="hallName">{$data['rst_name']}</h3>
+					<h3 class="hallName">{$data['name']}</h3>
 					<!-- <p class="hallNote">饮料、奶茶</p> -->
 				</div>
 				<div class="hallEvaluate">
@@ -30,26 +30,26 @@
 						<p class="units">送达/分钟</p>
 					</div>
 					<div>
-						<p class="grades">{$data['rst_agent_fee']}</p>
+						<p class="grades">{$data['agent_fee']}</p>
 						<p class="units">起送价/元</p>
 					</div>
 					<div>
-						<p class="grades">10</p>
+						<p class="grades">0</p>
 						<p class="units">配送费/元</p>
 					</div>
 				</div>
 			</div>
 			<div class="hallItem" id="hallPromotion">
 				<h3>餐厅公告</h3>
-				<p class="describe">{$data['rst_promotion_info']}</p>
+				<p class="describe">{$data['promotion_info']}</p>
 			</div>
 			<div class="hallItem" id="hallAddress">
 				<h3>餐厅地址</h3>
-				<p class="describe">{$data['rst_address']}</p>
+				<p class="describe">{$data['address']}</p>
 			</div>
 			<div class="hallItem" id="hallPhone">
 				<h3>餐厅电话</h3>
-				<p class="describe">{$data['rst_phone']}</p>
+				<p class="describe">{$data['phone']}</p>
 			</div>
 	</body>
 </html>
