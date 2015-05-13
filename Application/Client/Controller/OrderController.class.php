@@ -274,19 +274,25 @@ class OrderController extends ClientController {
     */
 
 
+// *******************接口1，供前端搜索手机号是否已注册
+// *******************接口2，供用户更新地址
+// *******************接口3，供用户删除地址
+// *******************接口4，供用户增加地址
+
     // 下单成功与否
     function done(){
         // echo NOW_TIME;die;
         if(IS_POST){
 
             // p(cookie('pltf2_curRst_info'));
-            // p(cookie('pltf_order_cookie'));die;
+            // p(cookie('pltf2_order_cookie'));die;
             // p(`());die;
             // p(cookie());die;
 
-            $json_order = cookie('pltf_order_cookie');
+            $json_order = cookie('pltf2_order_cookie');
             if(!$json_order){
         //检错*********************************************
+                // 没有订单信息的cookie
                 $this->error('Something Wrong！', U('Client/Restaurant/lists'));
             }
 
@@ -295,16 +301,39 @@ class OrderController extends ClientController {
             $order = json_decode($json_order, true);
             // p($order);die;
 
-            $rid = $order['rid'];
-            $model = M('today', $rid.'_');
+            // 检查该手机号对应的用户是否已经存在
+            //      不存在，则应先为该用户(隐性)注册，得到其client_ID
+            //      存在，得到其client_ID
+            $client_ID = get_client_ID($order);
 
-            $data['rid'] = $rid;
+            $r_ID = $order['r_ID'];
+            $guid = strval(1800 + mt_rand(1, 5000)).strval($r_ID).strval(NOW_TIME);//19位
+            echo "guid = ".$guid;
+
+            $temp['guid'] = $guid;
+            $temp['r_ID'] = $r_ID;
+            $temp['client_ID'] = $client_ID;
+
+            $temp['name'] = $order['c_name'];
+            $temp['address'] = $order['c_address'];
+            $temp['phone'] = $order['c_phone'];
+            $temp['total'] = $order['total'];
+            $temp['order_info'] = $json_order;
+            $temp['cTime'] = $order['cTime'];
+
+            $temp['today_sort'] = 'xx';// 如何确定该订单是今天第几个？
+
+            die;
+
+            $model = M('today', $r_ID.'_');
+
+            $data['r_ID'] = $r_ID;
             if($model->create($data) && $today_sort = $model->add($data)){
                 //$guid订单号，$today_sort今天第xx份订单
-                $guid = strval(1800 + $today_sort).strval($rid).strval(NOW_TIME);//19位
+                $guid = strval(1800 + $today_sort).strval($r_ID).strval(NOW_TIME);//19位
                 // echo "guid = ".$guid."<br/>today_sort = " . $today_sort."<br/>";
 
-                $temp['rid'] = $rid;
+                $temp['r_ID'] = $r_ID;
                 $temp['guid'] = $guid;
                 $temp['today_sort'] = $today_sort;
 
@@ -419,13 +448,13 @@ class OrderController extends ClientController {
 
             // 获取餐厅rid，再次验证餐厅状态
             $rst = session('pltf2_curRst_info');
-            $rst = $this->update_curRstInfo($rst['rid']);// 更新餐厅信息
+            $rst = $this->update_curRstInfo($rst['r_ID']);// 更新餐厅信息
 
 /*  更新餐厅信息
-            $rid = $rst['rid'];
+            $r_ID = $rst['r_ID'];
 
             // 重新访问数据库获取信息
-            $rst = M('resturant','home_')->where("rid = $rid")->field('rid,logo_url,rst_name,isOpen,rst_is_bookable,rst_agent_fee,
+            $rst = M('resturant','home_')->where("r_ID = $r_ID")->field('r_ID,logo_url,rst_name,isOpen,rst_is_bookable,rst_agent_fee,
                 stime_1_open,stime_1_close,stime_2_open,stime_2_close,stime_3_open,stime_3_close')->find();
             
     
@@ -483,22 +512,6 @@ class OrderController extends ClientController {
 
     // 购物车
     function cart(){
-/*
-        if (!is_null(cookie('pltf_order_cookie'))) {
-            if(IS_POST){
-                $this->display();
-            }else{
-                $this->error('请在餐厅内下单哦！', 'Client/Restaurant/lists');
-            }
-        }else{//没有cookie
-            if(IS_POST){
-                $this->error('美食篮是空的～您还没选餐哦！', 'Client/Restaurant/lists');
-            }else{
-                $this->error('Something Wrong！', 'Client/Restaurant/lists');
-            }
-        }
-*/
-        // p(cookie(''));die;
 
         if(IS_POST){
             
@@ -516,7 +529,7 @@ class OrderController extends ClientController {
                 // echo "222";die;
                 $this->display();
             }
-                        
+
         }else{
             redirect(U('Client/Restaurant/lists'));
         }

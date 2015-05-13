@@ -23,9 +23,9 @@ $(function() {
 	}
 
 
-	if($.cookie("pltf_curRst_info")){
+	if($.cookie("pltf2_curRst_info")){
 		// 全局变量，用于存放取得的当前餐厅信息cookie数组
-		var curRst_info = JSON.parse($.cookie("pltf_curRst_info"));
+		var curRst_info = JSON.parse($.cookie("pltf2_curRst_info"));
 	}
 
 
@@ -43,10 +43,10 @@ $(function() {
 		if (flagName && flagAddress && flagNumber) {
 			// 往cookie中添加数据
 
-			if ($.cookie("pltf_order_cookie") != null) {
+			if ($.cookie("pltf2_order_cookie") != null) {
 
 				// json转化数组样式
-				var order_list = $.cookie("pltf_order_cookie"); //cookie中的订单信息
+				var order_list = $.cookie("pltf2_order_cookie"); //cookie中的订单信息
 
 				// alert("60");
 
@@ -67,16 +67,16 @@ $(function() {
 
 				jsonArray["deliverTime"] = $("#select").val();
 
-				jsonArray["cTime"] = Math.round(new Date().getTime()/1000) + "";//UNIX时间戳
+				jsonArray["cTime"] = now_time();// Math.round(new Date().getTime()/1000) + "";//UNIX时间戳
 
 				jsonArray["isWeChat"] = is_weixin()+"";
-				jsonArray["openid"] = $.cookie("openid");
+				// jsonArray["openid"] = $.cookie("openid");
 
 				order_list = JSON.stringify(jsonArray);
 				// $("#postData").val(order_list);
 				// alert(order_list);
 
-				$.cookie("pltf_order_cookie", order_list);
+				$.cookie("pltf2_order_cookie", order_list);
 
 				order_submit_judge();//提交订单
 			}
@@ -86,6 +86,36 @@ $(function() {
 		}
 
 	})
+
+	/* 得到格式如"2015-05-13 21:09:05"的时间字符串 */
+	function now_time(){
+		var dt = new Date();
+
+		var year = dt.getFullYear();
+		var month = dt.getMonth()+1;
+		if (month < 9) {
+			month = "0" + month;
+		};
+		var day = dt.getDate();
+		if (day < 10) {
+			day = "0" + day;
+		};
+		var hour = dt.getHours();
+		if (hour < 10) {
+			hour = "0" + hour;
+		};
+		var min = dt.getMinutes();
+		if (min < 10) {
+			min = "0" + min;
+		};
+		var sec = dt.getSeconds();
+		if (sec < 10) {
+			sec = "0" + sec;
+		};
+
+		var formatTime = year + '-' + month + '-' + day + ' ' + hour + ':' + min + ':' + sec;
+		return formatTime;
+	}
 
 	function is_weixin(){
 
@@ -106,7 +136,7 @@ $(function() {
 			if(parseInt(curRst_info.open_status) % 10 == 4){//已过今天最晚营业时间，休息
 				alert("该餐厅已打烊");
 			}else{
-				if(curRst_info.rst_is_bookable == "1"){//可预订
+				if(curRst_info.is_bookable == "1"){//可预订
 					// alert("可预订");
 					$("#myForm3").submit();
 				}else{//不可预订

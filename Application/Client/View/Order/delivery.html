@@ -20,8 +20,8 @@
 	<!-- 如果存在送餐地址，则在此给出full_Address，在input中设置value -->
 	<div class="songcanxinxi" id="songcanAddress"><p class="one" id="newAddressStr">
 
-	<<?php $c_info = json_decode(cookie('c_info'),true); ?>
-		<notpresent name="$Think.session.c_info">添加送餐地址
+	<<?php $c_info = json_decode(cookie('c_info'),true); /*$c_info = array('name'=>'momo', 'address'=>'huashan 17', 'phone'=>'18826481053');*/?>
+		<notpresent name="$c_info">添加送餐地址
 
 			<else/>{$c_info['name']} {$c_info['address']} {$c_info['phone']}
 		</notpresent>

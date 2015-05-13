@@ -215,6 +215,16 @@ function cut_send_times($an_rst){
 	return $s_times;
 }
 
+// 不论注册与否，得到用户的ID
+function get_client_ID($order){
+
+	// 主要用到的是$order['c_phone'],$order['c_address'],$order['c_name']
+	
+	// 通过$order['c_phone']查找client表中是否有该用户
+	// 		有，则"比较当前数据和client数据库数据，如不一致，更新数据库数据"，得到client_ID，返回
+	// 		没有，则使用订单中的送餐信息"为用户注册"，得到client_ID，返回
+}
+
 // 获取卓效团队的接口得到的user_id
 function get_zx_userid($jump_url){
 
