@@ -279,7 +279,7 @@ class OrderController extends ClientController {
         // echo NOW_TIME;die;
         if(IS_POST){
 
-            // p(cookie('pltf_curRst_info'));
+            // p(cookie('pltf2_curRst_info'));
             // p(cookie('pltf_order_cookie'));die;
             // p(`());die;
             // p(cookie());die;
@@ -329,8 +329,8 @@ class OrderController extends ClientController {
                     // echo '$id = '.$id;//die;
 
                     // 清除session和cookie
-                    session('pltf_curRst_info', null);
-                    cookie('pltf_curRst_info', null);
+                    session('pltf2_curRst_info', null);
+                    cookie('pltf2_curRst_info', null);
 
                     
                     // 以下2句代码须同时使用，且顺序不能调换
@@ -412,14 +412,14 @@ class OrderController extends ClientController {
 
         if(IS_POST){
 
-            if (!session('?pltf_curRst_info')) {
+            if (!session('?pltf2_curRst_info')) {
         //检错*********************************************
                 $this->error('Something Wrong！', U('Client/Restaurant/lists'));
             }
 
             // 获取餐厅rid，再次验证餐厅状态
-            $rst = session('pltf_curRst_info');
-            $rst = $this->update_RstInfo($rst['rid']);// 更新餐厅信息
+            $rst = session('pltf2_curRst_info');
+            $rst = $this->update_curRstInfo($rst['rid']);// 更新餐厅信息
 
 /*  更新餐厅信息
             $rid = $rst['rid'];
@@ -441,13 +441,13 @@ class OrderController extends ClientController {
 
 
             $rst = rstInfo_combine($rst);
-            session('pltf_curRst_info', $rst);//更新当前餐厅信息，写入session
+            session('pltf2_curRst_info', $rst);//更新当前餐厅信息，写入session
 
             $rst['logo_url'] = urlencode($rst['logo_url']);//处理logo_url链接
             $json_rst = json_encode($rst);
             // p($rst);die;
             // p($json_rst);die;
-            cookie("pltf_curRst_info", urldecode($json_rst));//更新当前餐厅信息，写入cookie
+            cookie("pltf2_curRst_info", urldecode($json_rst));//更新当前餐厅信息，写入cookie
 */
             // cookie(null,'pltf_'); // 清空指定前缀的所有cookie值
 
@@ -510,8 +510,8 @@ class OrderController extends ClientController {
 
                 // p(cookie());die;
 
-                $rst = session('pltf_curRst_info');
-                $rst = $this->update_RstInfo($rst['rid']);// 更新餐厅信息
+                $rst = session('pltf2_curRst_info');
+                $rst = $this->update_curRstInfo($rst['rid']);// 更新餐厅信息
 
                 // echo "222";die;
                 $this->display();
@@ -528,28 +528,27 @@ class OrderController extends ClientController {
     function menu(){
         
         // cookie('pltf_order_cookie',null);
-        // cookie('pltf_curRst_info',null);
+        // cookie('pltf2_curRst_info',null);
         // p(cookie(''));die;
 
-        // $rid = 10456;//伪造数据，测试
+        // $r_ID = 10456;//伪造数据，测试
 
         if (IS_POST) {
 
 
             // p(I('post.'));die;
-            if(I('post.rid') == ""){
+            if(I('post.r_ID') == ""){
         //检错*********************************************
                 $this->error('Something Wrong！', U('Client/Restaurant/lists'));
             }
 
 
-
-            $rid = I('post.rid') / 10086;//简单加密的解密
-            $rst = $this->update_RstInfo($rid);// 获取餐厅信息，写入session和cookie
+            $r_ID = I('post.r_ID') / 10086;//简单加密的解密
+            $rst = $this->update_curRstInfo($r_ID);// 获取餐厅信息，写入session和cookie
 
 /*  获取餐厅信息
-            // 得到rid餐厅信息
-            $rst = M('resturant','home_')->where("rid = $rid")->field('rid,logo_url,rst_name,isOpen,rst_is_bookable,rst_agent_fee,
+            // 得到r_ID餐厅信息
+            $rst = M('resturant','home_')->where("r_ID = $r_ID")->field('r_ID,logo_url,rst_name,isOpen,rst_is_bookable,rst_agent_fee,
                 stime_1_open,stime_1_close,stime_2_open,stime_2_close,stime_3_open,stime_3_close')->find();
 
 
@@ -561,35 +560,44 @@ class OrderController extends ClientController {
 
             $rst = rstInfo_combine($rst);// 订餐页面所需要的餐厅的信息，组装
 
-            session('pltf_curRst_info', $rst);//将当前选择的餐厅信息写入session
+            session('pltf2_curRst_info', $rst);//将当前选择的餐厅信息写入session
 
             $rst['logo_url'] = urlencode($rst['logo_url']);//处理logo_url链接
             $json_rst = json_encode($rst);
             // p($rst);
             // p($json_rst);die;
-            cookie("pltf_curRst_info", urldecode($json_rst));//将当前选择的餐厅信息写入cookie
+            cookie("pltf2_curRst_info", urldecode($json_rst));//将当前选择的餐厅信息写入cookie
 
-            // p(session('pltf_curRst_info'));die;
+            // p(session('pltf2_curRst_info'));die;
 */
 
-            $data = M('menu',$rid.'_')->select();
+            // $data = M('menu',$r_ID.'_')->select();
+
+            $map['r_ID'] = $r_ID;
+            $data = M('menu')->where($map)->select();
+
+            // p($data);die;
+
+
             $this->assign('data', $data);//菜单列表
             $this->assign('rst', $rst);//餐厅信息
 
             $this->display();
         }else{
 
-            if(!session('?pltf_curRst_info')){
+            if(!session('?pltf2_curRst_info')){
         //检错*********************************************
                 redirect(U('Client/Restaurant/lists'));
             }
-            // p(session('pltf_curRst_info'));die;
-            // $rst = json_decode(cookie('pltf_curRst_info'),true);
+            // p(session('pltf2_curRst_info'));die;
+            // $rst = json_decode(cookie('pltf2_curRst_info'),true);
 
-            $rst = session('pltf_curRst_info');
-            $rst = $this->update_RstInfo($rst['rid']);// 更新餐厅信息
+            $rst = session('pltf2_curRst_info');
+            $rst = $this->update_curRstInfo($rst['r_ID']);// 更新餐厅信息
 
-            $data = M('menu',$rst['rid'].'_')->select();
+            $map['r_ID'] = $rst['r_ID'];
+            $data = M('menu')->where($map)->select();
+            
             $this->assign('data', $data);//菜单列表
             $this->assign('rst', $rst);//餐厅信息
 
@@ -597,31 +605,30 @@ class OrderController extends ClientController {
         }
     }
 
-    // 私有方法，用于获取/更新餐厅信息
-    private function update_RstInfo($rid){
+    // 私有方法，用于获取/更新当前餐厅信息
+    private function update_curRstInfo($r_ID){
 
-        // 得到rid餐厅信息
-        $rst = M('resturant','home_')->where("rid = $rid")->field('rid,logo_url,rst_name,isOpen,rst_is_bookable,rst_agent_fee,
-            stime_1_open,stime_1_close,stime_2_open,stime_2_close,stime_3_open,stime_3_close')->find();
+        $model = D("RestaurantView");
+        $map['userStatus'] = 1;// 餐厅账号开启
+        $map['serviceStatus'] = 1;// 餐厅服务开启
+        // 过滤得到符合展示要求的餐厅
+        $map['r_ID'] = $r_ID;
+        $rst = $model->where($map)->find();
 
 
         if(is_null($rst)){
     //检错*********************************************
-            $this->error('Something Wrong！', U('Client/Restaurant/lists'));   
+            // 餐厅不存在，或餐厅已关闭
+            $this->error('Something Wrong！', U('Client/Restaurant/lists'));
+            return;
         }
 
+        $rst = rstInfo_combine($rst);// 组装，订餐页面所需要的餐厅营业时间和销量
 
-        $rst = rstInfo_combine($rst);// 订餐页面所需要的餐厅的信息，组装
-
-        session('pltf_curRst_info', $rst);//将当前选择的餐厅信息写入session
-
-        $rst['logo_url'] = urlencode($rst['logo_url']);//处理logo_url链接
-        $json_rst = json_encode($rst);
-        // p($rst);
-        // p($json_rst);die;
-        cookie("pltf_curRst_info", urldecode($json_rst));//将当前选择的餐厅信息写入cookie
-
-        // p(session('pltf_curRst_info'));die;
+        session('pltf2_curRst_info', $rst);//将当前选择的餐厅信息写入session
+        $json_rst = json_encode($rst, JSON_UNESCAPED_UNICODE);// unicode格式
+        cookie("pltf2_curRst_info", $json_rst);//将当前选择的餐厅信息写入cookie
+        // p(cookie("pltf2_curRst_info"));die;
 
         return $rst;
     }

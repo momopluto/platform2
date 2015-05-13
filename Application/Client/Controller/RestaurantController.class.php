@@ -4,6 +4,9 @@ use Think\Controller;
 class RestaurantController extends ClientController {
 
 
+    /**
+     * 测试传递JSON数据
+     */
     function testJSON(){
 
         $data = array();
@@ -17,6 +20,9 @@ class RestaurantController extends ClientController {
         echo $data;
     }
 
+    /**
+     * 测试餐厅的视图模型
+     */
     function testRestaurantViewModel(){
 
         $model = D("RestaurantView");
@@ -30,7 +36,10 @@ class RestaurantController extends ClientController {
         echo $data;
     }
 
-    function testLists(){
+    /**
+     * 测试展示餐厅信息
+     */
+    function lists(){
 
         $model = D("RestaurantView");
         $map['userStatus'] = 1;// 餐厅账号开启
@@ -108,7 +117,7 @@ class RestaurantController extends ClientController {
     
 
     // 所有餐厅展示，供选择
-    function lists(){
+    function lists_old(){
         // echo "???";die;
         // cookie('pltf_openid', null);
         // cookie('openid',null);

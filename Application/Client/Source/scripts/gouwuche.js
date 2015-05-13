@@ -13,9 +13,9 @@ $(function() {
 	var agent_fee; //起送价，全局变量
 
 	var order_list; // 全局变量，用于存放取得的订单信息cookie数组
-	var order_cookie_name = "pltf_order_cookie"; //对应的cookie名
+	var order_cookie_name = "pltf2_order_cookie"; //对应的cookie名
 	var curRst_info; // 全局变量，用于存放取得的当前餐厅信息cookie		数组
-	var curRst_cookie_name = "pltf_curRst_info"; //对应的cookie名
+	var curRst_cookie_name = "pltf2_curRst_info"; //对应的cookie名
 
 	// 初始化没有点餐
 	for (var i = 0; i < clickArray.length; i++) {
@@ -26,16 +26,16 @@ $(function() {
 
 	$(document).ready(function() {
 		// 页面加载完毕后，即初始化前端数据**************************************************************
-
 		if ($.cookie(curRst_cookie_name) != null) {
 			// alert($.cookie(curRst_cookie_name));
 			curRst_info = JSON.parse($.cookie(curRst_cookie_name)); //初始化curRst_info
+			// console.log(curRst_info);
 			// alert("55 " + curRst_info);
 
 			if (curRst_info != null) {
 				// alert(JSON.stringify(curRst_info) + "curRst_info不空");
 
-				agent_fee = parseInt(curRst_info.rst_agent_fee); //即为起送价
+				agent_fee = parseInt(curRst_info.agent_fee); //即为起送价
 
 				rst_status_judge(); //判断餐厅状态
 				order_cookie_judge(); //判断是否已有选单cookie
@@ -59,7 +59,7 @@ $(function() {
 				});
 				$(".number").attr("disabled", "disabled");
 			} else {
-				if (curRst_info.rst_is_bookable == "1") { //可预订
+				if (curRst_info.is_bookable == "1") { //可预订
 					// alert("可预订");
 					$("#restState").css("display", "none");
 					$(".menu").css("margin-top","45px");
@@ -130,7 +130,7 @@ $(function() {
 						if (name == menuName) {
 							clickArray[j] = count;
 
-							if (order_list.rid == curRst_info.rid) {
+							if (order_list.r_ID == curRst_info.r_ID) {
 
 								var button = document.createElement("p");
 
@@ -168,16 +168,12 @@ $(function() {
 		orderIDArray[k] = $orderNameArray.eq(k).siblings(".menuNameforID").val();
 
 	}
+
 	// 获得菜单单价的数组列表
-
-
-
 	for (var m = 0; m < $BtnItemPrice.length; m++) {
 		orderPriceArray[m] = $BtnItemPrice.eq(m).text().slice(1);
 		// clickArray[m]=$BtnItemPrice.eq(m).siblings(".number").text();
 	}
-	
-
 
 	// 点击价钱的时候出现数量
 	$BtnItemPrice.mouseover(function() {
@@ -185,7 +181,7 @@ $(function() {
 	}).click(function() {
 		if (order_list != null && curRst_info != null) {
 
-			if (order_list.rid == curRst_info.rid) {
+			if (order_list.r_ID == curRst_info.r_ID) {
 				index = $BtnItemPrice.index(this);
 
 				if (clickArray[index] < 1) {
@@ -208,13 +204,12 @@ $(function() {
 
 					$(this).parent().find(".number").text(clickArray[index]);
 
-					// $("div:contains('John')")//这句什么意思？？？？？？？？？？？？？没用的测试数据
 					// 显示隐藏购物车的数量
 					$(".ItemName:contains('" + orderNameArray[index] + "')").siblings().find(".show_count").val(clickArray[index]);
 					Total(clickArray, index);
 				}
 			} else {
-				if (order_list != null && order_list.rid != curRst_info.rid) {
+				if (order_list != null && order_list.r_ID != curRst_info.r_ID) {
 
 					clearCart(); //清空美食篮子
 				}
@@ -243,7 +238,6 @@ $(function() {
 
 				$(this).parent().find(".number").text(clickArray[index]);
 
-				// $("div:contains('John')")//什么意思？？？？？？？？？？？？
 				$(".ItemName:contains('" + orderNameArray[index] + "')").siblings().find(".show_count").val(clickArray[index]);
 				Total(clickArray, index);
 			}
@@ -282,11 +276,11 @@ $(function() {
 		if (jsonArray != null && jsonArray.total != "0") {
 
 			if (order_list != null) {
-				// alert("当前餐厅rid ＝ " + curRst_info.rid);
-				// alert("原餐厅rid ＝ " + order_list.rid);
+				// alert("当前餐厅pltf2_curRst_info ＝ " + curRst_info.r_ID);
+				// alert("原餐厅r_ID ＝ " + order_list.r_ID);
 
-				if (order_list.rid != curRst_info.rid) {
-					jsonArray["rid"] = order_list.rid;
+				if (order_list.r_ID != curRst_info.r_ID) {
+					jsonArray["r_ID"] = order_list.r_ID;
 				}
 			}
 
@@ -318,7 +312,6 @@ $(function() {
 
 			$(this).parent().find(".number").text(clickArray[index]);
 
-
 			var text = orderNameArray[index];
 
 			$(".ItemName:contains('" + text + "')").siblings().find(".show_count").val(clickArray[index]);
@@ -341,7 +334,7 @@ $(function() {
 
 		event.preventDefault();
 
-		if (order_list != null && order_list.rid != curRst_info.rid) {
+		if (order_list != null && order_list.r_ID != curRst_info.r_ID) {
 
 			clearCart(); //清空美食篮子
 
@@ -363,9 +356,8 @@ $(function() {
 
 	function Total(clickArray, index) {
 	
-	
 		var jsonArray = {
-			"rid": curRst_info.rid, //""curRst_info.rid
+			"r_ID": curRst_info.r_ID, //""curRst_info.r_ID
 			"total": "",
 			"item": new Array(),
 			"note": ""
@@ -373,10 +365,6 @@ $(function() {
 		
 		var account = 0;
 		var number=0;
-
-
-		
-		
 
 		for (var i = 0,j=0; i < clickArray.length; i++) {
 			if (clickArray[i] > 0) {
@@ -394,19 +382,7 @@ $(function() {
 				j++;
 
 			}
-
-
-		}
-		// var p=0;
-		// while(p<jsonArray["item"].length){
-		// 	if(clickArray[p]==0){
-				
-		// 		jsonArray["item"].splice(p,1);
-		// 	}else{
-		// 		p++;
-		// 	}
-		// }
-		
+		}	
 		
 		if (account >= agent_fee) {
 			$(".jiesuan").css("display", "block");
@@ -416,10 +392,8 @@ $(function() {
 			$(".jiesuan").css("display", "none");
 			$(".shortcComing").css("display", "block");
 			var shortcComing = agent_fee - account;
-
 			$(".shortcComing span").text(shortcComing);
 		}
-
 
 		jsonArray["total"] = account + "";
 
@@ -428,9 +402,7 @@ $(function() {
 		$(".account_menu").text(number);
 		$(".total_price").text(account);
 
-
 		setCookie(jsonArray);
-	
 	}
 
 })

@@ -15,11 +15,11 @@
     
     define('DOMAIN_URL', "http://127.0.0.1:8080");//服务器域名
 
-    define('PUBLIC_URL', '/platform/Application/Public');//Public公共文件夹路径
+    define('PUBLIC_URL', '/platform2/Application/Public');//Public公共文件夹路径
     
-    define('ADMIN_SRC', '/platform/Application/Admin/Source');//Admin资源文件夹路径
-    define('HOME_SRC', '/platform/Application/Home/Source');//Home资源文件夹路径
-    define('CLIENT_SRC', '/platform/Application/CLient/Source');//CLient资源文件夹路径
+    define('ADMIN_SRC', '/platform2/Application/Admin/Source');//Admin资源文件夹路径
+    define('HOME_SRC', '/platform2/Application/Home/Source');//Home资源文件夹路径
+    define('CLIENT_SRC', '/platform2/Application/CLient/Source');//CLient资源文件夹路径
 
     define('ADMIN_TITLE', '订餐平台后台');
     define('HOME_TITLE', '餐厅管理系统');
