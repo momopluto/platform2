@@ -502,7 +502,7 @@ class OrderController extends ClientController {
 
         if(IS_POST){
             
-            if(is_null(cookie('pltf_order_cookie'))){
+            if(is_null(cookie('pltf2_order_cookie'))){
         //检错*********************************************
                 // echo "111";die;
                 $this->success('美食篮空空如也，快去挑选餐厅选餐吧！', U('Client/Restaurant/lists'), 3);
@@ -511,7 +511,7 @@ class OrderController extends ClientController {
                 // p(cookie());die;
 
                 $rst = session('pltf2_curRst_info');
-                $rst = $this->update_curRstInfo($rst['rid']);// 更新餐厅信息
+                $rst = $this->update_curRstInfo($rst['r_ID']);// 更新餐厅信息
 
                 // echo "222";die;
                 $this->display();
@@ -520,21 +520,13 @@ class OrderController extends ClientController {
         }else{
             redirect(U('Client/Restaurant/lists'));
         }
-
     }
 
 
     // 对应餐厅的菜单
     function menu(){
-        
-        // cookie('pltf_order_cookie',null);
-        // cookie('pltf2_curRst_info',null);
-        // p(cookie(''));die;
-
-        // $r_ID = 10456;//伪造数据，测试
 
         if (IS_POST) {
-
 
             // p(I('post.'));die;
             if(I('post.r_ID') == ""){
@@ -542,10 +534,8 @@ class OrderController extends ClientController {
                 $this->error('Something Wrong！', U('Client/Restaurant/lists'));
             }
 
-
             $r_ID = I('post.r_ID') / 10086;//简单加密的解密
             $rst = $this->update_curRstInfo($r_ID);// 获取餐厅信息，写入session和cookie
-
 
             $map['r_ID'] = $r_ID;
             $data = M('menu')->where($map)->select();

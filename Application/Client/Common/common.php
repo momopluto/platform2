@@ -4,22 +4,6 @@
  *
  */
 
-// 按营业额排序"营业&非营业餐厅"
-function sortBy_sales(&$open_rsts, &$close_rsts){
-
-	$today = date('Y-m-d');//今日
-	$month_days = getMonth_StartAndEnd($today);//本月第1日和最后1日，数组时间戳
-
-	if (strtotime($today) != $month_days[0]) {
-	    //不是每月第1天，以本月售为排序标准
-	    uasort($open_rsts, 'compare_month_sales');//降序
-	    uasort($close_rsts, 'compare_month_sales');//降序
-	}else{
-	    //本月第1天，以上月销售为排序标准
-	    uasort($open_rsts, 'compare_last_month_sales');//降序
-	    uasort($close_rsts, 'compare_last_month_sales');//降序
-	}
-}
 
 // 比较本月销售额(降序)，用于所有餐厅排序
 function compare_month_sales($x, $y){
@@ -44,12 +28,15 @@ function compare_last_month_sales($x, $y){
 	}
 }
 
-// 订餐页面所需要的餐厅的信息，组装
-// 判断当前时间餐厅状态以及月销售量
+/**
+ * 订餐页面所需要的餐厅的信息，组装
+ * 判断当前时间餐厅状态以及月销售量
+ * @param  Array $an_rst 某一餐厅
+ * @return Array         组装过后的餐厅信息
+ */
 function rstInfo_combine($an_rst){
 	// 判断是否营业时间
     $n_time = date('H:i');
-
 
     if(strtotime($n_time) < strtotime($an_rst['time_1_open'])){
         $open_status = "0";
@@ -97,6 +84,64 @@ function rstInfo_combine($an_rst){
     return $an_rst;
 }
 
+/**
+ * 将餐厅分为"营业"和"非营业"2类
+ * @param  Array $rsts        所有餐厅
+ * @param  Array &$open_rsts  营业餐厅，引用类型
+ * @param  Array &$close_rsts 非营业餐厅，引用类型
+ */
+function classify_open_n_close_rsts($rsts, &$open_rsts, &$close_rsts){
+
+	foreach ($rsts as $an_rst) {
+
+	    $an_rst = rstInfo_combine($an_rst);// 订餐页面所需要的餐厅的信息，组装
+	    
+	    $key = $an_rst['r_ID'];// 键为餐厅ID
+
+	    if($an_rst['isOpen'] == "1"){//主观，营业
+	        // echo $an_rst['open_status']."status！";die;
+	        if(intval($an_rst['open_status']) % 10 == 4){//已过餐厅今天的所有营业时间
+	            // echo $an_rst['r_ID']."打烊了啊！";die;
+	            $close_rsts[$key] = $an_rst;
+	        }else{
+	            if($an_rst['is_bookable']){
+	                $open_rsts[$key] = $an_rst;
+	            }else{
+	                if($an_rst['open_status'] == "1" || $an_rst['open_status'] == "2" || $an_rst['open_status'] == "3"){
+	                    $open_rsts[$key] = $an_rst;
+	                }else{
+	                    $close_rsts[$key] = $an_rst;
+	                }
+	            }
+	        } 
+	    }else{//主观，其它，非营业
+	        $close_rsts[$key] = $an_rst;
+	    }    
+	}
+}
+
+
+/**
+ * 按营业额排序"营业&非营业餐厅"
+ * @param  Array &$open_rsts  营业餐厅，引用类型
+ * @param  Array &$close_rsts 非营业餐厅，引用类型
+ */
+function sortBy_sales(&$open_rsts, &$close_rsts){
+
+	$today = date('Y-m-d');//今日
+	$month_days = getMonth_StartAndEnd($today);//本月第1日和最后1日，数组时间戳
+
+	if (strtotime($today) != $month_days[0]) {
+	    //不是每月第1天，以本月售为排序标准
+	    uasort($open_rsts, 'compare_month_sales');//降序
+	    uasort($close_rsts, 'compare_month_sales');//降序
+	}else{
+	    //本月第1天，以上月销售为排序标准
+	    uasort($open_rsts, 'compare_last_month_sales');//降序
+	    uasort($close_rsts, 'compare_last_month_sales');//降序
+	}
+}
+
 
 // 将open - close之间的时间，以10分钟为间隔分割
 function cut_cut($open, $close, $on){
@@ -109,7 +154,7 @@ function cut_cut($open, $close, $on){
 	if($on){//餐厅正在营业
 
 		if(($strClose  - $strOpen) / 60 > 40){
-			
+
 			$strOpen = $strOpen + (600 - $strOpen % 600);//向上取整为10的倍数
 
 			for ($i=2; $i <= ($strClose  - $strOpen) / 600; $i++) { 

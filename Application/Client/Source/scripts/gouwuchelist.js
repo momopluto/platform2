@@ -2,9 +2,9 @@ $(function() {
 
 
 	var curRst_info; // 全局变量，用于存放取得的当前餐厅信息cookie数组
-	var curRst_cookie_name = "pltf_curRst_info"; //对应的cookie名
+	var curRst_cookie_name = "pltf2_curRst_info"; //对应的cookie名
 
-	var order_cookie_name = "pltf_order_cookie"; //订单信息cookie名
+	var order_cookie_name = "pltf2_order_cookie"; //订单信息cookie名
 
 	$(document).ready(function() {
 		// 页面加载完毕后，即初始化前端数据**************************************************************
@@ -36,7 +36,7 @@ $(function() {
 				// $(".show_count").attr("disabled", "true");
 				$("#formSubmit2").css("background", "rgb(141,213,153)");
 			} else {
-				if (curRst_info.rst_is_bookable == "1") { //可预订
+				if (curRst_info.is_bookable == "1") { //可预订
 					// alert("可预订");
 					$(".add_sub").removeAttr("disabled");
 					// $(".show_count").removeAttr("disabled");
@@ -218,9 +218,9 @@ $(function() {
 		} else {
 			var number = 0;
 			var totalPrice = 0;
-			// alert("chelist  134" + curRst_info.rid);
+			// alert("chelist  134" + curRst_info.r_ID);
 			var jsonArray = {
-				"rid": curRst_info.rid,
+				"r_ID": curRst_info.r_ID,
 				"total": "",
 				"item": new Array(),
 				"note": ""
@@ -259,8 +259,8 @@ $(function() {
 			// alert(jsonString);
 			$.cookie("pltf_order_cookie", jsonString); //设置cookie 
 
-			if (totalPrice < parseInt(curRst_info.rst_agent_fee)) {
-				var balance = parseInt(curRst_info.rst_agent_fee) - totalPrice;
+			if (totalPrice < parseInt(curRst_info.agent_fee)) {
+				var balance = parseInt(curRst_info.agent_fee) - totalPrice;
 				$("#formSubmit2").text("还差 " + balance + "元起送").css("background", "rgb(141,213,153)");
 
 			} else {
@@ -277,7 +277,7 @@ $(function() {
 
 		event.preventDefault();
 
-		if (parseInt($("#total").text()) >= parseInt(curRst_info.rst_agent_fee)) {
+		if (parseInt($("#total").text()) >= parseInt(curRst_info.agent_fee)) {
 
 			order_submit_judge(); //提交订单
 
@@ -292,7 +292,7 @@ $(function() {
 			if (parseInt(curRst_info.open_status) % 10 == 4) { //已过今天最晚营业时间，休息
 				alert("该餐厅已打烊");
 			} else {
-				if (curRst_info.rst_is_bookable == "1") { //可预订
+				if (curRst_info.is_bookable == "1") { //可预订
 					// alert("可预订");
 					$("#myForm2").submit();
 				} else { //不可预订
