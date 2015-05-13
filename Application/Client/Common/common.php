@@ -4,11 +4,28 @@
  *
  */
 
+// 按营业额排序"营业&非营业餐厅"
+function sortBy_sales(&$open_rsts, &$close_rsts){
+
+	$today = date('Y-m-d');//今日
+	$month_days = getMonth_StartAndEnd($today);//本月第1日和最后1日，数组时间戳
+
+	if (strtotime($today) != $month_days[0]) {
+	    //不是每月第1天，以本月售为排序标准
+	    uasort($open_rsts, 'compare_month_sales');//降序
+	    uasort($close_rsts, 'compare_month_sales');//降序
+	}else{
+	    //本月第1天，以上月销售为排序标准
+	    uasort($open_rsts, 'compare_last_month_sales');//降序
+	    uasort($close_rsts, 'compare_last_month_sales');//降序
+	}
+}
+
 // 比较本月销售额(降序)，用于所有餐厅排序
-function compare_month_sale($x, $y){
-	if($x['month_sale'] == $y['month_sale']){//
+function compare_month_sales($x, $y){
+	if($x['month_sales'] == $y['month_sales']){//
 		return 0;
-	}elseif($x['month_sale'] > $y['month_sale']){
+	}elseif($x['month_sales'] > $y['month_sales']){
 		return -1;
 	}else{
 		return 1;
@@ -17,10 +34,10 @@ function compare_month_sale($x, $y){
 
 
 // 比较上个月销售额(降序)，用于所有餐厅排序
-function compare_last_month_sale($x, $y){
-	if($x['last_month_sale'] == $y['last_month_sale']){//
+function compare_last_month_sales($x, $y){
+	if($x['last_month_sales'] == $y['last_month_sales']){//
 		return 0;
-	}elseif($x['last_month_sale'] > $y['last_month_sale']){
+	}elseif($x['last_month_sales'] > $y['last_month_sales']){
 		return -1;
 	}else{
 		return 1;
@@ -34,34 +51,34 @@ function rstInfo_combine($an_rst){
     $n_time = date('H:i');
 
 
-    if(strtotime($n_time) < strtotime($an_rst['stime_1_open'])){
+    if(strtotime($n_time) < strtotime($an_rst['time_1_open'])){
         $open_status = "0";
-    }elseif(strtotime($n_time) <= strtotime($an_rst['stime_1_close'])){
+    }elseif(strtotime($n_time) <= strtotime($an_rst['time_1_close'])){
         $open_status = "1";
     }else{
         $open_status = "14";
     }
 
-    if ($an_rst['stime_2_open'] !== '' && $an_rst['stime_2_close'] !== '') {
+    if ($an_rst['time_2_open'] !== '' && $an_rst['time_2_close'] !== '') {
         $has_2_time = true;
-        if(strtotime($n_time) < strtotime($an_rst['stime_2_open'])){
+        if(strtotime($n_time) < strtotime($an_rst['time_2_open'])){
             if($open_status == "14"){
                 $open_status = "12";
             }
-        }elseif(strtotime($n_time) <= strtotime($an_rst['stime_2_close'])){
+        }elseif(strtotime($n_time) <= strtotime($an_rst['time_2_close'])){
             $open_status = "2";
         }else{
             $open_status = "24";
         }
     }
 
-    if ($an_rst['stime_3_open'] !== '' && $an_rst['stime_3_close'] !== '') {
+    if ($an_rst['time_3_open'] !== '' && $an_rst['time_3_close'] !== '') {
         $has_2_time = true;
-        if(strtotime($n_time) < strtotime($an_rst['stime_3_open'])){
+        if(strtotime($n_time) < strtotime($an_rst['time_3_open'])){
             if($open_status == "24"){
                 $open_status = "23";
             }
-        }elseif(strtotime($n_time) <= strtotime($an_rst['stime_3_close'])){
+        }elseif(strtotime($n_time) <= strtotime($an_rst['time_3_close'])){
             $open_status = "3";
         }else{
             $open_status = "4";
@@ -70,8 +87,12 @@ function rstInfo_combine($an_rst){
 
     $an_rst['open_status'] = $open_status;
 
-    $an_rst['month_sale'] = M('menu', $an_rst['rid']."_")->sum('month_sale');//本月销售量
-    $an_rst['last_month_sale'] = M('menu', $an_rst['rid']."_")->sum('last_month_sale');//本月销售量
+    $menuModel = M('menu');
+    $month_sales = $menuModel->where(array('r_ID'=>$an_rst['r_ID']))->sum('month_sales');//本月销售量
+    $last_month_sales = $menuModel->where(array('r_ID'=>$an_rst['r_ID']))->sum('last_month_sales');//上月销售量
+
+    $an_rst['month_sales'] = $month_sales ? $month_sales : 0;
+    $an_rst['last_month_sales'] = $last_month_sales ? $last_month_sales : 0;
 
     return $an_rst;
 }
@@ -120,27 +141,27 @@ function cut_send_times($an_rst){
 		
 		if($an_rst['open_status'] == "0"){
 
-			$s_times = cut_cut($an_rst['stime_1_open'], $an_rst['stime_1_close'], 0);
+			$s_times = cut_cut($an_rst['time_1_open'], $an_rst['time_1_close'], 0);
 
 		}elseif($an_rst['open_status'] == "1"){
 
-			$s_times = cut_cut(date('H:i'), $an_rst['stime_1_close'], 1);
+			$s_times = cut_cut(date('H:i'), $an_rst['time_1_close'], 1);
 
 		}elseif($an_rst['open_status'] == "12"){
 
-			$s_times = cut_cut($an_rst['stime_2_open'], $an_rst['stime_2_close'], 0);
+			$s_times = cut_cut($an_rst['time_2_open'], $an_rst['time_2_close'], 0);
 
 		}elseif($an_rst['open_status'] == "2"){
 
-			$s_times = cut_cut(date('H:i'), $an_rst['stime_2_close'], 1);
+			$s_times = cut_cut(date('H:i'), $an_rst['time_2_close'], 1);
 
 		}elseif($an_rst['open_status'] == "23"){
 
-			$s_times = cut_cut($an_rst['stime_3_open'], $an_rst['stime_3_close'], 0);
+			$s_times = cut_cut($an_rst['time_3_open'], $an_rst['time_3_close'], 0);
 
 		}elseif($an_rst['open_status'] == "3"){
 
-			$s_times = cut_cut(date('H:i'), $an_rst['stime_3_close'], 1);
+			$s_times = cut_cut(date('H:i'), $an_rst['time_3_close'], 1);
 
 		}
 

@@ -9,7 +9,7 @@ function p($array){
     dump($array, 1, '<pre>', 0);
 }
 
-// 获取本月的第1天和最后1天
+// 获取date所处月的第1天和最后1天
 function getMonth_StartAndEnd($date){
     $firstday = date("Y-m-01",strtotime($date));
     $lastday = date("Y-m-d",strtotime("$firstday +1 month -1 day"));

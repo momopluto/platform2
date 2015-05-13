@@ -10,24 +10,82 @@ class RestaurantController extends ClientController {
         $data['total'] = 50;
         $data['item'][0] = array('name'=>"菜式1", 'price'=>10, 'count'=>2, 'total'=>20);
         $data['item'][1] = array('name'=>"菜式2", 'price'=>10, 'count'=>3, 'total'=>30);
-        $data['note'] = "testtttttttttttttttttt";
+        $data['note'] = "http://momopluto.xicp.net/platform/Application/Uploads/rst_logo/default_rst_logo.jpg";
 
         $data = json_encode($data, JSON_UNESCAPED_UNICODE);// unicode格式
 
         echo $data;
-        // exit($data);
-        // var_dump($data);
-
-        // $this->ajaxReturn($data);
-        // p($data);die;
     }
 
+    function testRestaurantViewModel(){
 
-    // ajax，每次切换订单页面，即访问该方法，取得餐厅的最新状态
-    function getRstStatus(){
+        $model = D("RestaurantView");
+        
+        $data = $model->select();
+        // p($model);
+        // p($data);
 
-        $this->ajaxReturn("testtttttttttttttttttt");
+        $data = json_encode($data, JSON_UNESCAPED_UNICODE);// unicode格式
+
+        echo $data;
     }
+
+    function testLists(){
+
+        $model = D("RestaurantView");
+        $map['userStatus'] = 1;// 餐厅账号开启
+        $map['serviceStatus'] = 1;// 餐厅服务开启
+        // 过滤得到符合展示要求的餐厅
+        $rsts = $model->where($map)->select();
+
+        // p($rsts);
+
+        $open_rsts = array();
+        $close_rsts = array();
+        foreach ($rsts as $an_rst) {
+
+            $an_rst = rstInfo_combine($an_rst);// 订餐页面所需要的餐厅的信息，组装
+            
+            $key = $an_rst['r_ID'];// 键为餐厅ID
+
+            if($an_rst['isOpen'] == "1"){//主观，营业
+                // echo $an_rst['open_status']."status！";die;
+                if(intval($an_rst['open_status']) % 10 == 4){//已过餐厅今天的所有营业时间
+                    // echo $an_rst['rid']."打烊了啊！";die;
+                    $close_rsts[$key] = $an_rst;
+                }else{
+                    if($an_rst['is_bookable']){
+                        $open_rsts[$key] = $an_rst;
+                    }else{
+                        if($an_rst['open_status'] == "1" || $an_rst['open_status'] == "2" || $an_rst['open_status'] == "3"){
+                            $open_rsts[$key] = $an_rst;
+                        }else{
+                            $close_rsts[$key] = $an_rst;
+                        }
+                    }
+                } 
+            }else{//主观，其它，非营业
+                $close_rsts[$key] = $an_rst;
+            }    
+        }
+        
+        // 按营业额排序"营业&非营业餐厅"
+        sortBy_sales($open_rsts, $close_rsts);
+
+        // echo "--------------------营业餐厅";
+        // p($open_rsts);
+        // echo "--------------------休息餐厅";
+        // p($close_rsts);
+
+        // 如果是app来的访问，返回json;否则dispaly()
+        // isApp();
+
+        $this->assign('open_rsts', $open_rsts);
+        $this->assign('close_rsts', $close_rsts);
+
+        $this->display('lists');
+    }
+
 
     // 进入餐厅选择页面前，取得用户token和openid，然后写入cookie
     function checkUserValid(){

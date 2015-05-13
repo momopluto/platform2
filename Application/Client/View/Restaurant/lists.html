@@ -39,14 +39,14 @@
 						    <a href="#" class="hallHref">
 							<img class="hallimg" width="42" height="42" src="{$one_rst['logo_url']}">
 							<div class="halltext">
-								<p class="caption">{$one_rst['rst_name']}<!-- <span class="new">新</span> --></p>
+								<p class="caption">{$one_rst['name']}<!-- <span class="new">新</span> --></p>
 								<if condition="$one_rst['open_status'] % 10 != 4">
 									<p class="accept">接受预定{$one_rst['open_status']}</p>
 								</if>
-								<p class="describe">月售<span class="count">{$one_rst['month_sale']}</span>单/<span class="prePrice">{$one_rst['rst_agent_fee']}</span>元起送/<span class="sendTime">
-									<if condition="$one_rst['open_status'] == '0' || $one_rst['open_status'] == '1'">{$one_rst['stime_1_open']}
-										<elseif condition="$one_rst['open_status'] == '2' || $one_rst['open_status'] == '12'"/>{$one_rst['stime_2_open']}
-										<elseif condition="$one_rst['open_status'] == '3' || $one_rst['open_status'] == '23'"/>{$one_rst['stime_3_open']}
+								<p class="describe">月售<span class="count">{$one_rst['month_sales']}</span>单/<span class="prePrice">{$one_rst['agent_fee']}</span>元起送/<span class="sendTime">
+									<if condition="$one_rst['open_status'] == '0' || $one_rst['open_status'] == '1'">{$one_rst['time_1_open']}
+										<elseif condition="$one_rst['open_status'] == '2' || $one_rst['open_status'] == '12'"/>{$one_rst['time_2_open']}
+										<elseif condition="$one_rst['open_status'] == '3' || $one_rst['open_status'] == '23'"/>{$one_rst['time_3_open']}
 									</if>
 								</span>开始营业</p>
 							    <!-- <p class="onePrice"><span class="redOne">1</span>1元抢购-GZ</p>
@@ -56,7 +56,7 @@
 							</a>
 							<div class="clear"></div>
 
-							<input type="hidden" name="rid" value="<?php echo 10086 * $one_rst['rid'];?>">
+							<input type="hidden" name="rid" value="<?php echo 10086 * $one_rst['r_ID'];?>">
 
 						</form>
 					</li>
@@ -88,15 +88,15 @@
 						    <a href="#" class="hallHref">
 							<img class="hallimg" width="42" height="42" src="{$one_rst['logo_url']}">
 							<div class="halltext">
-								<p class="caption">{$one_rst['rst_name']}<!-- <span class="new">新</span> --></p>
+								<p class="caption">{$one_rst['name']}<!-- <span class="new">新</span> --></p>
 								<if condition="$one_rst['open_status'] % 10 != 4">
 
 									<p class="accept">接受预定</p>
 								</if>
-								<p class="describe">月售<span class="count">{$one_rst['month_sale']}</span>单/<span class="prePrice">{$one_rst['rst_agent_fee']}</span>元起送/<span class="sendTime">
-									<if condition="$one_rst['open_status'] == 0 || $one_rst['open_status'] == 1">{$one_rst['stime_1_open']}
-										<elseif condition="$one_rst['open_status'] == 2 || $one_rst['open_status'] == 12"/>{$one_rst['stime_2_open']}
-										<elseif condition="$one_rst['open_status'] == 3 || $one_rst['open_status'] == 23"/>{$one_rst['stime_3_open']}
+								<p class="describe">月售<span class="count">{$one_rst['month_sales']}</span>单/<span class="prePrice">{$one_rst['agent_fee']}</span>元起送/<span class="sendTime">
+									<if condition="$one_rst['open_status'] == 0 || $one_rst['open_status'] == 1">{$one_rst['time_1_open']}
+										<elseif condition="$one_rst['open_status'] == 2 || $one_rst['open_status'] == 12"/>{$one_rst['time_2_open']}
+										<elseif condition="$one_rst['open_status'] == 3 || $one_rst['open_status'] == 23"/>{$one_rst['time_3_open']}
 									</if>
 								</span>开始营业</p>
 							    <!-- <p class="onePrice"><span class="redOne">1</span>1元抢购-GZ</p>
@@ -107,7 +107,7 @@
 							</a>
 							<div class="clear"></div>
 
-							<input type="hidden" name="rid" value="<?php echo 10086 * $one_rst['rid'];?>">
+							<input type="hidden" name="rid" value="<?php echo 10086 * $one_rst['r_ID'];?>">
 
 						</form>
 					</li>
