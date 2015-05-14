@@ -18,6 +18,7 @@ class RestaurantController extends ClientController {
         $data = json_encode($data, JSON_UNESCAPED_UNICODE);// unicode格式
 
         echo $data;
+        p($_SERVER);
     }
 
     /**
@@ -63,9 +64,17 @@ class RestaurantController extends ClientController {
         // echo "--------------------休息餐厅";
         // p($close_rsts);
 
-        // 如果是app来的访问，返回json;否则dispaly()
-        // isApp();
 
+        // 如果是app来的访问，返回json
+        if (I('get.srcid') == '10086') {
+            
+            $JSON['data']['open_rsts'] = $open_rsts;
+            $JSON['data']['close_rsts'] = $close_rsts;
+
+            echo json_encode($JSON, JSON_UNESCAPED_UNICODE); 
+            return;
+        }
+        
         $this->assign('open_rsts', $open_rsts);
         $this->assign('close_rsts', $close_rsts);
 
@@ -89,6 +98,16 @@ class RestaurantController extends ClientController {
         $data = M('restaurant')->where($map)->find();
         // p($data);die;
         if($data){
+
+            // 如果是app来的访问，返回json
+            if (I('get.srcid') == '10086') {
+                
+                $JSON['data']['rst'] = $data;
+
+                echo json_encode($JSON, JSON_UNESCAPED_UNICODE); 
+                return;
+            }
+
             $this->assign('data', $data);
         }
 

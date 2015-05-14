@@ -553,8 +553,15 @@ class OrderController extends ClientController {
             $map['r_ID'] = $r_ID;
             $data = M('menu')->where($map)->select();
 
-            // p($data);die;
-            // 判断来源是App则返回JSON数据
+            // 如果是app来的访问，返回json
+            if (I('get.srcid') == '10086') {
+                
+                $JSON['data']['menus'] = $data;
+                $JSON['data']['rst'] = $rst;
+
+                echo json_encode($JSON, JSON_UNESCAPED_UNICODE); 
+                return;
+            }
 
             $this->assign('data', $data);//菜单列表
             $this->assign('rst', $rst);//餐厅信息
@@ -574,6 +581,16 @@ class OrderController extends ClientController {
 
             $map['r_ID'] = $rst['r_ID'];
             $data = M('menu')->where($map)->select();
+
+            // 如果是app来的访问，返回json
+            if (I('get.srcid') == '10086') {
+                
+                $JSON['data']['menus'] = $data;
+                $JSON['data']['rst'] = $rst;
+
+                echo json_encode($JSON, JSON_UNESCAPED_UNICODE); 
+                return;
+            }
             
             $this->assign('data', $data);//菜单列表
             $this->assign('rst', $rst);//餐厅信息

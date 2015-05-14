@@ -102,20 +102,20 @@ function classify_open_n_close_rsts($rsts, &$open_rsts, &$close_rsts){
 	        // echo $an_rst['open_status']."status！";die;
 	        if(intval($an_rst['open_status']) % 10 == 4){//已过餐厅今天的所有营业时间
 	            // echo $an_rst['r_ID']."打烊了啊！";die;
-	            $close_rsts[$key] = $an_rst;
+	            $close_rsts[/*$key*/] = $an_rst;
 	        }else{
 	            if($an_rst['is_bookable']){
-	                $open_rsts[$key] = $an_rst;
+	                $open_rsts[/*$key*/] = $an_rst;
 	            }else{
 	                if($an_rst['open_status'] == "1" || $an_rst['open_status'] == "2" || $an_rst['open_status'] == "3"){
-	                    $open_rsts[$key] = $an_rst;
+	                    $open_rsts[/*$key*/] = $an_rst;
 	                }else{
-	                    $close_rsts[$key] = $an_rst;
+	                    $close_rsts[/*$key*/] = $an_rst;
 	                }
 	            }
 	        } 
 	    }else{//主观，其它，非营业
-	        $close_rsts[$key] = $an_rst;
+	        $close_rsts[/*$key*/] = $an_rst;
 	    }    
 	}
 }
@@ -133,12 +133,12 @@ function sortBy_sales(&$open_rsts, &$close_rsts){
 
 	if (strtotime($today) != $month_days[0]) {
 	    //不是每月第1天，以本月售为排序标准
-	    uasort($open_rsts, 'compare_month_sales');//降序
-	    uasort($close_rsts, 'compare_month_sales');//降序
+	    usort($open_rsts, 'compare_month_sales');//降序
+	    usort($close_rsts, 'compare_month_sales');//降序
 	}else{
 	    //本月第1天，以上月销售为排序标准
-	    uasort($open_rsts, 'compare_last_month_sales');//降序
-	    uasort($close_rsts, 'compare_last_month_sales');//降序
+	    usort($open_rsts, 'compare_last_month_sales');//降序
+	    usort($close_rsts, 'compare_last_month_sales');//降序
 	}
 }
 
