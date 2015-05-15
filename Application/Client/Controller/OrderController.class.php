@@ -284,11 +284,6 @@ class OrderController extends ClientController {
         // echo NOW_TIME;die;
         if(IS_POST){
 
-            // p(cookie('pltf2_curRst_info'));
-            // p(cookie('pltf2_order_cookie'));die;
-            // p(`());die;
-            // p(cookie());die;
-
             $json_order = cookie('pltf2_order_cookie');
             if(!$json_order){
         //检错*********************************************
@@ -296,15 +291,21 @@ class OrderController extends ClientController {
                 $this->error('Something Wrong！', U('Client/Restaurant/lists'));
             }
 
-
+            // ***************验证phone为11位数字
 
             $order = json_decode($json_order, true);
-            // p($order);die;
-
+            p($order);
+            
+            // 首先，需要明确的是，当用户能够提交数据至此方法时，
+            // 说明已经取得了有其手机号、地址、姓名，但这里不能确定该用户是否已注册
+            // 所以要做下面的工作：
             // 检查该手机号对应的用户是否已经存在
             //      不存在，则应先为该用户(隐性)注册，得到其client_ID
             //      存在，得到其client_ID
             $client_ID = get_client_ID($order);
+
+            dump( $client_ID );
+            die;
 
             $r_ID = $order['r_ID'];
             $guid = strval(1800 + mt_rand(1, 5000)).strval($r_ID).strval(NOW_TIME);//19位
