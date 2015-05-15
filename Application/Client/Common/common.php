@@ -215,15 +215,58 @@ function cut_send_times($an_rst){
 	return $s_times;
 }
 
-// 不论注册与否，得到用户的ID
+
+/**
+ * 不论该手机号是否注册，得到对应用户的ID
+ * @param  Array $order 订餐信息数组(含手机号)
+ * @return 成功返回client_ID;否则返回false
+ */
 function get_client_ID($order){
 
 	// 主要用到的是$order['c_phone'],$order['c_address'],$order['c_name']
 	
 	// 通过$order['c_phone']查找client表中是否有该用户
-	// 		有，则"比较当前数据和client数据库数据，如不一致，更新数据库数据"，得到client_ID，返回
+	// 		有，则返回client_ID，返回
 	// 		没有，则使用订单中的送餐信息"为用户注册"，得到client_ID，返回
+
+	$model = M('client');
+
+	$map['phone'] = $order['c_phone'];
+	$one = $model->where($map)->find();
+
+	if ($one) {
+		// 已注册
+		return $one['client_ID'];
+	}else{
+		//未注册
+		//替用户注册得到client_ID
+
+		// 写入表client
+		$reg_data['phone'] = $order['c_phone'];
+		$reg_data['name'] = $order['c_name'];
+		$reg_data['reg_time'] = date('Y-m-d H:i:s');
+
+		// p($reg_data);
+		$client_ID = $model->add($reg_data);
+		// p($model);
+
+		if ($client_ID) {
+			// 写入表client_address
+			
+			$addr_data['address'] = $order['c_address'];
+			$addr_data['client_ID'] = $client_ID;
+
+			if (!M('client_address')->add($addr_data)) {
+				// 未成功插入地址
+				// 此处不需要事务。因为可以仅为用户注册，而没有绑定地址
+				return false;
+			}
+			
+			return $client_ID;
+		}
+	}
 }
+
 
 // 获取卓效团队的接口得到的user_id
 function get_zx_userid($jump_url){
