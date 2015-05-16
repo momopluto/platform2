@@ -215,6 +215,38 @@ function cut_send_times($an_rst){
 	return $s_times;
 }
 
+/**
+ * 判断该手机号是否已存在于client表中
+ * @param string $phone 手机号
+ * @return 成功返回一条记录;失败返回false
+ */
+function is_exists_phone($phone){
+
+	$model = M('client');
+
+	$map['phone'] = $phone;
+	return $model->where($map)->find();
+}
+
+/**
+ * 获取该用户的所有送餐地址
+ * @param string $client_ID 用户ID
+ * @param bool $option 选择是否返回完整数据
+ * @return 成功返回地址数组;失败返回NULL
+ */
+function get_client_address($client_ID, $option=true){
+
+	$model = M('client_address');
+	$map['client_ID'] = $client_ID;
+
+	if ($option) {
+		$one = $model->where($map)->select();// 一条记录中的完整数据
+	}else {
+		$one = $model->where($map)->field('address_ID,address')->select();// 去掉了记录中的client_ID
+	}
+	
+	return $one;
+}
 
 /**
  * 不论该手机号是否注册，得到对应用户的ID
@@ -229,10 +261,7 @@ function get_client_ID($order){
 	// 		有，则返回client_ID，返回
 	// 		没有，则使用订单中的送餐信息"为用户注册"，得到client_ID，返回
 
-	$model = M('client');
-
-	$map['phone'] = $order['c_phone'];
-	$one = $model->where($map)->find();
+	$one = is_exists_phone($order['c_phone']);
 
 	if ($one) {
 		// 已注册
@@ -247,8 +276,9 @@ function get_client_ID($order){
 		$reg_data['reg_time'] = date('Y-m-d H:i:s');
 
 		// p($reg_data);
-		$client_ID = $model->add($reg_data);
-		// p($model);
+		$client_model = M('client');
+		$client_ID = $client_model->add($reg_data);
+		// p($client_model);
 
 		if ($client_ID) {
 			// 写入表client_address
@@ -256,7 +286,8 @@ function get_client_ID($order){
 			$addr_data['address'] = $order['c_address'];
 			$addr_data['client_ID'] = $client_ID;
 
-			if (!M('client_address')->add($addr_data)) {
+			$addr_model = M('client_address');
+			if (!$addr_model->add($addr_data)) {
 				// 未成功插入地址
 				// 此处不需要事务。因为可以仅为用户注册，而没有绑定地址
 				return false;

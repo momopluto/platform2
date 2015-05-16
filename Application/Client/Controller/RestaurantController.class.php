@@ -18,7 +18,7 @@ class RestaurantController extends ClientController {
         $data = json_encode($data, JSON_UNESCAPED_UNICODE);// unicode格式
 
         echo $data;
-        p($_SERVER);
+        // p($_SERVER);
     }
 
     /**

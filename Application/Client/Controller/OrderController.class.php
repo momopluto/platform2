@@ -274,11 +274,6 @@ class OrderController extends ClientController {
     */
 
 
-// *******************接口1，供前端搜索手机号是否已注册
-// *******************接口2，供用户更新地址
-// *******************接口3，供用户删除地址
-// *******************接口4，供用户增加地址
-
     // 下单成功与否
     function done(){
         // echo NOW_TIME;die;
@@ -625,6 +620,167 @@ class OrderController extends ClientController {
         // p(cookie("pltf2_curRst_info"));die;
 
         return $rst;
+    }
+
+
+// *******************接口1，查询手机号是否已注册
+
+// 能用到以下接口，说明该用户是已经注册的
+// *******************接口2，供用户更新地址
+// *******************接口3，供用户删除地址
+// *******************接口4，供用户增加地址
+
+    /**
+     * <interface>,判断手机号是否已注册
+     * 已注册，则返回"用户信息+地址信息"
+     * 未注册，返回errcode=9001005，获取用户信息失败
+     */
+    function is_phone_exists(){
+
+        if (!$phone = I('post.phone')) {
+            $this->error('参数错误！');
+        }
+
+        // $phone = '18888888889';// test
+        // $phone = '18826481053';// test
+
+        $one = is_exists_phone($phone);
+
+        if (!$one) {
+
+            $data['errcode'] = '9001005';
+            $data['errmsg'] = '获取用户信息失败';
+        }else {
+
+            $data['client_ID'] = $one['client_ID'];
+            $data['name'] = $one['name'];
+            $data['phone'] = $one['phone'];
+
+            $data['addr'] = get_client_address($one['client_ID'], false);// 如果找不到，为NULL
+        }
+
+        // 如果是app来的访问，返回json
+        if (I('get.srcid') == '10086') {
+            
+            $JSON['data'] = $data;
+
+            echo json_encode($JSON, JSON_UNESCAPED_UNICODE); 
+            return;
+        }
+
+        // echo json_encode($data, JSON_UNESCAPED_UNICODE);
+        // p($data);die;
+
+        $this->ajaxReturn($data, 'json');
+    }
+
+    function update_addr(){
+
+        /*
+        Array
+        (
+            [address_ID] => 556
+            [address] => 华山17栋
+        )
+        */
+        $new_addr['address_ID'] = I('post.address_ID');
+        $new_addr['address'] = I('post.address');
+
+        $model = M('client_address');
+        $res = $model->save($new_addr);
+
+        if (!$res) {
+
+            $data['errcode'] = '9001017';
+            $data['errmsg'] = '更新地址信息失败';
+        }else{
+
+            $data['result'] = $res;
+        }
+
+        // 如果是app来的访问，返回json
+        if (I('get.srcid') == '10086') {
+            
+            $JSON['data'] = $data;
+
+            echo json_encode($JSON, JSON_UNESCAPED_UNICODE); 
+            return;
+        }
+
+        $this->ajaxReturn($data, 'json');
+    }
+
+    function del_addr(){
+
+        /*
+        Array
+        (
+            [address_ID] => 556
+        )
+        */
+        $map['address_ID'] = I('post.address_ID');
+
+        $model = M('client_address');
+        $res = $model->where($map)->delete();
+
+        if (!$res) {
+
+            $data['errcode'] = '9001016';
+            $data['errmsg'] = '删除地址信息失败';
+        }else{
+
+            $data['result'] = $res;
+        }
+
+        // 如果是app来的访问，返回json
+        if (I('get.srcid') == '10086') {
+            
+            $JSON['data'] = $data;
+
+            echo json_encode($JSON, JSON_UNESCAPED_UNICODE); 
+            return;
+        }
+
+        $this->ajaxReturn($data, 'json');
+    }
+
+    function add_addr(){
+
+        /*
+        Array
+        (
+            [client_ID] => 10000
+            [address] => 华山17栋
+        )
+        */
+        $new_addr['client_ID'] = I('post.client_ID');
+        $new_addr['address'] = I('post.address');
+
+        // $new_addr['client_ID'] = 10000;
+        // $new_addr['address'] = 'huashan 17 in SCAU';
+
+        $model = M('client_address');
+        $res = $model->add($new_addr);
+
+        if (!$res) {
+
+            $data['errcode'] = '9001015';
+            $data['errmsg'] = '新增地址信息失败';
+        }else{
+
+            $data['result'] = $res;
+        }
+
+        // 如果是app来的访问，返回json
+        if (I('get.srcid') == '10086') {
+
+            $JSON['data'] = $data;
+
+            echo json_encode($JSON, JSON_UNESCAPED_UNICODE); 
+            return;
+        }
+
+        $this->ajaxReturn($data, 'json');
     }
 
 }
