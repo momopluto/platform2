@@ -552,8 +552,9 @@ class OrderController extends ClientController {
             // 如果是app来的访问，返回json
             if (I('get.srcid') == '10086') {
                 
-                $JSON['data']['menus'] = $data;
-                $JSON['data']['rst'] = $rst;
+                $JSON['data'] = $data;
+                // $JSON['data']['menus'] = $data;
+                // $JSON['data']['rst'] = $rst;
 
                 echo json_encode($JSON, JSON_UNESCAPED_UNICODE); 
                 return;
@@ -581,8 +582,9 @@ class OrderController extends ClientController {
             // 如果是app来的访问，返回json
             if (I('get.srcid') == '10086') {
                 
-                $JSON['data']['menus'] = $data;
-                $JSON['data']['rst'] = $rst;
+                $JSON['data'] = $data;
+                // $JSON['data']['menus'] = $data;
+                // $JSON['data']['rst'] = $rst;
 
                 echo json_encode($JSON, JSON_UNESCAPED_UNICODE); 
                 return;
