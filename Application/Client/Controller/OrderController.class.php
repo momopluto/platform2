@@ -652,6 +652,8 @@ class OrderController extends ClientController {
 
             $data['errcode'] = '9001005';
             $data['errmsg'] = '获取用户信息失败';
+
+            $JSON = $data;
         }else {
 
             $data['client_ID'] = $one['client_ID'];
@@ -659,12 +661,12 @@ class OrderController extends ClientController {
             $data['phone'] = $one['phone'];
 
             $data['addr'] = get_client_address($one['client_ID'], false);// 如果找不到，为NULL
+
+            $JSON['data'] = $data;
         }
 
         // 如果是app来的访问，返回json
         if (I('get.srcid') == '10086') {
-            
-            $JSON['data'] = $data;
 
             echo json_encode($JSON, JSON_UNESCAPED_UNICODE); 
             return;
@@ -703,7 +705,7 @@ class OrderController extends ClientController {
         // 如果是app来的访问，返回json
         if (I('get.srcid') == '10086') {
             
-            $JSON['data'] = $data;
+            $JSON = $data;
 
             echo json_encode($JSON, JSON_UNESCAPED_UNICODE); 
             return;
@@ -737,7 +739,7 @@ class OrderController extends ClientController {
         // 如果是app来的访问，返回json
         if (I('get.srcid') == '10086') {
             
-            $JSON['data'] = $data;
+            $JSON = $data;
 
             echo json_encode($JSON, JSON_UNESCAPED_UNICODE); 
             return;
@@ -760,7 +762,7 @@ class OrderController extends ClientController {
 
         // $new_addr['client_ID'] = 10000;
         // $new_addr['address'] = 'huashan 17 in SCAU';
-
+        
         $model = M('client_address');
         $res = $model->add($new_addr);
 
@@ -776,7 +778,7 @@ class OrderController extends ClientController {
         // 如果是app来的访问，返回json
         if (I('get.srcid') == '10086') {
 
-            $JSON['data'] = $data;
+            $JSON = $data;
 
             echo json_encode($JSON, JSON_UNESCAPED_UNICODE); 
             return;
