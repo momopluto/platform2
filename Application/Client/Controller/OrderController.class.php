@@ -317,7 +317,7 @@ class OrderController extends ClientController {
             $temp['order_info'] = $json_order;
             $temp['cTime'] = $order['cTime'];
 
-            $temp['today_sort'] = 'xx';// 如何确定该订单是今天第几个？
+            // $temp['today_sort'] = 'xx';// 如何确定该订单是今天第几个？
 
             die;
 
@@ -632,8 +632,10 @@ class OrderController extends ClientController {
 // *******************接口3，供用户删除地址
 // *******************接口4，供用户增加地址
 
+
     /**
      * <interface>,判断手机号是否已注册
+     * 需要数据：phone
      * 已注册，则返回"用户信息+地址信息"
      * 未注册，返回errcode=9001005，获取用户信息失败
      */
@@ -678,6 +680,12 @@ class OrderController extends ClientController {
         $this->ajaxReturn($data, 'json');
     }
 
+    /**
+     * <interface>,更新地址
+     * 需要数据：address_ID, address
+     * 成功，返回影响的数据行数
+     * 失败，返回errcode=9001017，更新地址信息失败
+     */
     function update_addr(){
 
         /*
@@ -714,6 +722,12 @@ class OrderController extends ClientController {
         $this->ajaxReturn($data, 'json');
     }
 
+    /**
+     * <interface>,删除地址
+     * 需要数据：address_ID
+     * 成功，返回影响的数据行数
+     * 失败，返回errcode=9001016，删除地址信息失败
+     */
     function del_addr(){
 
         /*
@@ -748,6 +762,12 @@ class OrderController extends ClientController {
         $this->ajaxReturn($data, 'json');
     }
 
+    /**
+     * <interface>,新增地址
+     * 需要数据：client_ID, address
+     * 成功，返回新增地址的address_ID
+     * 失败，返回errcode=9001015，新增地址信息失败
+     */
     function add_addr(){
 
         /*
@@ -785,6 +805,33 @@ class OrderController extends ClientController {
         }
 
         $this->ajaxReturn($data, 'json');
+    }
+
+
+// *******************下单接口，验证订单，更新用户信息
+// *******************查询订单接口
+
+
+    /**
+     * <interface>,提交订单
+     * 需要数据：订单信息
+     * 成功，返回影响的数据行数
+     * 失败，返回errcode=40035，不合法的参数
+     */
+    function submit(){
+
+        echo "submit can work!";
+    }
+
+    /**
+     * <interface>,查询历史订单
+     * 需要数据：client_ID
+     * 成功，返回"历史订单"
+     * 失败，返回errcode=40003，不合法的client_ID
+     */
+    function orders(){
+
+        echo "orders can work!";
     }
 
 }
