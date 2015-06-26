@@ -4,7 +4,39 @@ use Think\Controller;
 class OrderController extends ClientController {
 
 
+    /**
+     * 查询历史订单
+     * 分PC和移动端处理
+     */
+    function orders(){
 
+        echo "orders can work!";
+
+        if (I('get.srcid') == null) {
+            
+            // pc
+            // 直接用session中的标识
+            $data = $this->get_his_orders(session('CLIENT_ID'));
+
+            $this->assign('data',$data);
+            $this->display('order');
+        }else {
+            if (I('get.srcid') == '10086') {
+                
+                // 根据post过来的client_ID
+                $data = $this->get_his_orders(I('post.client_ID'));
+
+                $JSON['data'] = $data;
+                echo json_encode($JSON, JSON_UNESCAPED_UNICODE); 
+            }else {
+
+                // do nothing
+                return;
+            }
+        }
+    }
+
+    
     // 查询订单
     function myOrder(){
 
@@ -274,84 +306,28 @@ class OrderController extends ClientController {
     */
 
 
-    // 下单成功与否
+    /**
+     * 最终下单
+     * 分PC和移动端处理
+     */
     function done(){
-        // echo NOW_TIME;die;
-        if(IS_POST){
+        
+        if (I('get.srcid') == null) {// ***********************PC端的提交请求
 
-            $json_order = cookie('pltf2_order_cookie');
-            if(!$json_order){
-        //检错*********************************************
-                // 没有订单信息的cookie
-                $this->error('Something Wrong！', U('Client/Restaurant/lists'));
-            }
+            if(IS_POST){
 
-            // ***************验证phone为11位数字
+                $json_order = cookie('pltf2_order_cookie');
+                if(!$json_order){
 
-            $order = json_decode($json_order, true);
-            p($order);
-            
-            // 首先，需要明确的是，当用户能够提交数据至此方法时，
-            // 说明已经取得了有其手机号、地址、姓名，但这里不能确定该用户是否已注册
-            // 所以要做下面的工作：
-            // 检查该手机号对应的用户是否已经存在
-            //      不存在，则应先为该用户(隐性)注册，得到其client_ID
-            //      存在，得到其client_ID
-            $client_ID = get_client_ID($order);
+                    // 没有订单信息的cookie
+                    $this->error('Something Wrong！', U('Client/Restaurant/lists'));
+                }
 
-            dump( $client_ID );
-            die;
+                $order = json_decode($json_order, true);
 
-            $r_ID = $order['r_ID'];
-            $guid = strval(1800 + mt_rand(1, 5000)).strval($r_ID).strval(NOW_TIME);//19位
-            echo "guid = ".$guid;
+                $data = $this->handle_order($order);
 
-            $temp['guid'] = $guid;
-            $temp['r_ID'] = $r_ID;
-            $temp['client_ID'] = $client_ID;
-
-            $temp['name'] = $order['c_name'];
-            $temp['address'] = $order['c_address'];
-            $temp['phone'] = $order['c_phone'];
-            $temp['total'] = $order['total'];
-            $temp['order_info'] = $json_order;
-            $temp['cTime'] = $order['cTime'];
-
-            // $temp['today_sort'] = 'xx';// 如何确定该订单是今天第几个？
-
-            die;
-
-            $model = M('today', $r_ID.'_');
-
-            $data['r_ID'] = $r_ID;
-            if($model->create($data) && $today_sort = $model->add($data)){
-                //$guid订单号，$today_sort今天第xx份订单
-                $guid = strval(1800 + $today_sort).strval($r_ID).strval(NOW_TIME);//19位
-                // echo "guid = ".$guid."<br/>today_sort = " . $today_sort."<br/>";
-
-                $temp['r_ID'] = $r_ID;
-                $temp['guid'] = $guid;
-                $temp['today_sort'] = $today_sort;
-
-
-                // 此处的token和openid该从cookie中取
-                $temp['token'] = cookie('token');// "gh_34b3b2e6ed7f";
-                $temp['openid'] = cookie('openid');// "o55gotzkfpEcJoQGXBtIKoSrairQ";
-
-
-
-                $temp['name'] = $order['c_name'];
-                $temp['address'] = $order['c_address'];
-                $temp['phone'] = $order['c_phone'];
-                $temp['total'] = $order['total'];
-                $temp['order_info'] = $json_order;
-                $temp['cTime'] = $order['cTime'];
-
-                // p($temp);die;
-
-                $_model = M('orderitem', ' ');
-                if($id = $_model->add($temp)){
-                    // echo '$id = '.$id;//die;
+                if ($data['result']) {// 成功写入数据库
 
                     // 清除session和cookie
                     session('pltf2_curRst_info', null);
@@ -361,72 +337,32 @@ class OrderController extends ClientController {
                     // 以下2句代码须同时使用，且顺序不能调换
                     cookie('pltf_order_cookie', null);// 删thinkphp中的cookie
                     setcookie("pltf_order_cookie", "", time()-1);// 真正从浏览器中删除
-                    
-                    // p(session());p(cookie());die;
-
-                // 判断该用户cookie('openid')是否存在于orderman表中
-                    // 在，则更新这个用户id下的手机、地址信息cookie，写入数据库；
-                    // 不在，则新增入数据库;
-
-
-
-                    if (is_weixin()) {//微信浏览器is_weixin()
-
-                        $man_model = M('orderman','admin_');
-                        if ($uuu = $man_model->where(array('openid'=>cookie('openid')))->find()) {
-                            // 存在该手机号
-                            // 更新这个用户id下的地址信息cookie，写入数据库；
-
-                            
-                            $update['name'] = $temp['name'];
-                            $update['phone'] = $temp['phone'];
-                            $update['address'] = $temp['address'];
-
-
-                            $c_info = json_decode(cookie('c_info'),true);
-
-                            // echo "--".$update['name']."--<br/>";
-                            // echo "--".$c_info['name']."--<br/>";
-
-                            if (array_diff($update, $c_info) || array_diff($c_info, $update)) {
-                                
-                                // 数组内容有不同，更新
-                                // p($update);die;
-
-                                cookie('c_info', json_encode($update));
-                                
-                                $u_id = $uuu['id'];
-                                $man_model->where("id = $u_id")->setField($update);
-                            }
-
-                        }else{// 新手机号
-
-                            // token、openid、name、phone、address、cTime
-                            
-                            $update['name'] = $temp['name'];
-                            $update['phone'] = $temp['phone'];
-                            $update['address'] = $temp['address'];
-
-                            $update['token'] = $temp['token'];
-                            $update['openid'] = $temp['openid'];
-                            $update['cTime'] = NOW_TIME;
-
-                            // $man_model->create($update) && 
-                            $man_model->add($update);
-                        }
-                    }
-                    // 微信浏览器的话没必要，写了cookie也会被清掉，况且进入微信浏览器的时候会从数据库里取phone的cookie
-
-                    // cookie('pltf_phone') = $temp['phone'];// 留下身份唯一标识
 
                     $this->display();
-                }else{
-                    $this->error($_model->getError());
-                }
-            }
-        }else{
+                }else {
 
-            redirect(U('Client/Restaurant/lists'));
+                    $this->error('下单未能完成，请稍后再试！');
+                }
+
+            }else {
+
+                redirect(U('Client/Restaurant/lists'));
+                return;
+            }
+
+        }else {// *****************************非PC端，如：移动端
+            if (I('get.srcid') == '10086') {// 且srcid是指定的值
+                
+                $json_order = I('post.order');
+                $order = json_decode($json_order, true);
+
+                $data = $this->handle_order($order);
+                echo json_encode($data, JSON_UNESCAPED_UNICODE);
+            }else {
+
+                redirect(U('Client/Restaurant/lists'));
+                return;
+            }
         }
     }
 
@@ -446,63 +382,15 @@ class OrderController extends ClientController {
             $rst = session('pltf2_curRst_info');
             $rst = $this->update_curRstInfo($rst['r_ID']);// 更新餐厅信息
 
-/*  更新餐厅信息
-            $r_ID = $rst['r_ID'];
-
-            // 重新访问数据库获取信息
-            $rst = M('resturant','home_')->where("r_ID = $r_ID")->field('r_ID,logo_url,rst_name,isOpen,rst_is_bookable,rst_agent_fee,
-                stime_1_open,stime_1_close,stime_2_open,stime_2_close,stime_3_open,stime_3_close')->find();
-            
-    
-            if (is_null($rst)) {//空则跳转
-    
-                $this->error('Something Wrong！', U('Client/Restaurant/lists'));
-            }
-
-            // if (!$rst['isOpen']) {// isOpen＝0餐厅休息，无法完成下单操作
-                
-            //     $this->error('餐厅休息！无法下单！', U('Client/Restaurant/lists'));
-            // }
-
-
-            $rst = rstInfo_combine($rst);
-            session('pltf2_curRst_info', $rst);//更新当前餐厅信息，写入session
-
-            $rst['logo_url'] = urlencode($rst['logo_url']);//处理logo_url链接
-            $json_rst = json_encode($rst);
-            // p($rst);die;
-            // p($json_rst);die;
-            cookie("pltf2_curRst_info", urldecode($json_rst));//更新当前餐厅信息，写入cookie
-*/
-            // cookie(null,'pltf_'); // 清空指定前缀的所有cookie值
-
             $s_times = cut_send_times($rst);
             $this->assign('s_times', $s_times);
-
-
-    // 测试用******************************************************
-            // session('pltf_openid', 'o55gotzkfpEcJoQGXBtIKoSrairQ');
-            // 根据缓存的session从数据内取name, phone, address信息
-            // 完全可以在缓存session时一并将该用户的name, phone, address缓存，则不需要这一步
-// ********************************************************************************************
-            // if(session('?pltf_openid')){
-            //     $map['openid'] = session('pltf_openid');
-            //     $c_info = M('orderman', 'admin_')->where($map)->field('name, phone, address')->find();
-            //     if(!is_null($c_info)){
-
-            //         $this->assign('c_info', $c_info);
-            //         // p($c_info);die;
-            //     }
-            // }
-
-            
+       
             $this->display();
             
         }else{
 
             redirect(U('Client/Restaurant/lists'));
         }
-
     }
 
 
@@ -580,15 +468,15 @@ class OrderController extends ClientController {
             $data = M('menu')->where($map)->select();
 
             // 如果是app来的访问，返回json
-            if (I('get.srcid') == '10086') {
+            // if (I('get.srcid') == '10086') {
                 
-                $JSON['data'] = $data;
-                // $JSON['data']['menus'] = $data;
-                // $JSON['data']['rst'] = $rst;
+            //     $JSON['data'] = $data;
+            //     // $JSON['data']['menus'] = $data;
+            //     // $JSON['data']['rst'] = $rst;
 
-                echo json_encode($JSON, JSON_UNESCAPED_UNICODE); 
-                return;
-            }
+            //     echo json_encode($JSON, JSON_UNESCAPED_UNICODE); 
+            //     return;
+            // }
             
             $this->assign('data', $data);//菜单列表
             $this->assign('rst', $rst);//餐厅信息
@@ -813,25 +701,137 @@ class OrderController extends ClientController {
 
 
     /**
-     * <interface>,提交订单
-     * 需要数据：订单信息
-     * 成功，返回影响的数据行数
-     * 失败，返回errcode=40035，不合法的参数
+     * 处理订单信息
+     * @param  array $order 订单信息数组
+     * @return array        成功，返回影响的数据行数；失败，返回errcode=40035，不合法的参数
      */
-    function submit(){
+    function handle_order($order){
 
-        echo "submit can work!";
+        // 检验数组，确保需要用到的"键"都存在，array_key_exists(key,array)
+        //      即，只能判断传过来的数据是否少了，判断不了传过来的数据是否多了
+        //          而即使数据多了，也是被忽略不处理的，所以也OK
+        // 然后是get_client_ID()
+        // 完了组装数据写入数据库
+
+    /*
+        $order['r_ID'] = 0;
+        $order['total'] = 1;
+        $order['item'] = 2;
+        $order['c_name'] = 3;
+        $order['c_address'] = 4;
+        $order['c_phone'] = 5;
+        $order['note'] = 6;
+        $order['deliverTime'] = 7;
+        $order['cTime'] = 8;
+    */
+
+        // p($order);
+
+        // 检验订单信息数组，确保需要用到的"键"都存在
+        $valid = check_order_array_key_exists($order);
+
+        if (!$valid) {
+            
+            $data['errcode'] = '40035';
+            $data['errmsg'] = '不合法的参数';
+
+            return $data;
+
+            // $JSON = $data;
+
+            // echo json_encode($JSON, JSON_UNESCAPED_UNICODE); 
+            // return;
+        }
+
+        // echo "键是否都存在？<br/>";
+        // dump($valid);
+        // die;
+
+
+        // ************以下为得到用户的client_ID
+        // 首先，需要明确的是，当用户能够提交数据至此方法时，
+        // 说明已经取得了有其手机号、地址、姓名，但这里不能确定该用户是否已注册
+        // 所以要做下面的工作：
+        // 检查该手机号对应的用户是否已经存在
+        //      不存在，则应先为该用户(隐性)注册，得到其client_ID
+        //      存在，得到其client_ID
+        $client_ID = get_client_ID($order);
+
+        // dump( $client_ID );
+        // die;
+
+        $r_ID = $order['r_ID'];
+        $guid = strval(1800 + mt_rand(1, 5000)).strval($r_ID).strval(NOW_TIME);//19位
+        // echo "guid = ".$guid;
+
+        $temp['guid'] = $guid;
+        $temp['r_ID'] = $r_ID;
+        $temp['client_ID'] = $client_ID;
+
+        $temp['name'] = $order['c_name'];
+        $temp['address'] = $order['c_address'];
+        $temp['phone'] = $order['c_phone'];
+        $temp['total'] = $order['total'];
+        $temp['order_info'] = $json_order;
+        $temp['cTime'] = $order['cTime'];
+
+        // p($temp);
+        // die;
+
+        $model = M('orderitem');
+        $res = $model->add($temp);
+
+        if (!$res) {
+            
+            $data['errcode'] = '40035';
+            $data['errmsg'] = '不合法的参数_';
+        }else {
+
+            $data['result'] = $res;
+        }
+
+        return $data;
+
+        // $JSON = $data;
+        // echo json_encode($JSON, JSON_UNESCAPED_UNICODE);
     }
 
     /**
-     * <interface>,查询历史订单
-     * 需要数据：client_ID
-     * 成功，返回"历史订单"
-     * 失败，返回errcode=40003，不合法的client_ID
+     * 获取客户1个月内的历史订单
+     * @param  int $client_ID 客户ID
+     * @return array          历史订单
      */
-    function orders(){
+    function get_his_orders($client_ID){
 
-        echo "orders can work!";
+        $map['client_ID'] = $client_ID;
+        $model = D('OrderView');
+
+        $today = date('Y-m-d');//今日
+        $month_days = getMonth_StartAndEnd($today);//本月第1日和最后1日，数组时间戳
+        $last_month_days = getLastMonth_StartAndEnd($today);//上月第1日和最后1日，数组时间戳
+
+        // 上月底到本月底的订单
+        $t_brief = $model->where($map)->where("cTime between '"
+            .date('Y-m-d H:i:s',$last_month_days[1])."' and '"
+            .date('Y-m-d H:i:s',$month_days[1])."'")->order('cTime desc')->field('guid,cTime,r_ID,total,status,reason')->select();
+
+        if(!is_null($t_brief)){
+        // 存在订单数据
+
+            // 转换时间显示格式
+            foreach ($t_brief as $one) {
+
+                $one['cTime'] = date('n.d H:i', strtotime($one['cTime']));
+
+                $data[] = $one;
+                // p($one);die;
+            }
+            // p($data);die;
+
+            return $data;
+        }
+
+        return null;
     }
 
 }

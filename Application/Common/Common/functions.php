@@ -43,6 +43,15 @@ function getNextMonth_StartAndEnd($date){
     return array(strtotime($firstday),strtotime($lastday));//返回时间戳
 }
 
+/**
+ * 获取当前日期时间datetime，用于插入数据库
+ * @return date 格式如：1991-01-01 14:08:27
+ */
+function getDatetime(){
+
+    return date('Y-m-d H:i:s',time());
+}
+
 
 /*========================================送餐队长接口 begin===================================*/
 //订单信息detail，用于接口

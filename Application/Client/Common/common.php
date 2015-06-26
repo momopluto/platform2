@@ -29,12 +29,12 @@ function compare_last_month_sales($x, $y){
 }
 
 /**
- * 订餐页面所需要的餐厅的信息，组装
- * 判断当前时间餐厅状态以及月销售量
- * @param  Array $an_rst 某一餐厅
- * @return Array         组装过后的餐厅信息
+ * 得到餐厅营业状态
+ * @param  array $an_rst 餐厅信息
+ * @return string        餐厅状态
  */
-function rstInfo_combine($an_rst){
+function get_open_status($an_rst){
+
 	// 判断是否营业时间
     $n_time = date('H:i');
 
@@ -72,7 +72,19 @@ function rstInfo_combine($an_rst){
         }
     }
 
-    $an_rst['open_status'] = $open_status;
+    return $open_status;
+}
+
+/**
+ * 订餐页面所需要的餐厅的信息，组装
+ * 判断当前时间餐厅状态以及月销售量
+ * @param  Array $an_rst 某一餐厅
+ * @return Array         组装过后的餐厅信息
+ */
+function rstInfo_combine($an_rst){
+
+	// 得到餐厅营业状态
+    $an_rst['open_status'] = get_open_status($an_rst);
 
     $menuModel = M('menu');
     $month_sales = $menuModel->where(array('r_ID'=>$an_rst['r_ID']))->sum('month_sales');//本月销售量
@@ -213,6 +225,29 @@ function cut_send_times($an_rst){
 	}
 
 	return $s_times;
+}
+
+
+/**
+ * 检验订单信息数组，确保需要用到的"键"都存在
+ * @param  array $order 订单信息数组
+ * @return bool         是否合法
+ */
+function check_order_array_key_exists($order){
+
+	// 需要检查的key
+	$ORDER_KEY = array('r_ID','total','item','c_name','c_address','c_phone','note','deliverTime','cTime');
+	// p($ORDER_KEY);
+
+	foreach ($ORDER_KEY as $key) {
+		
+		if (!array_key_exists($key, $order)){
+
+			return false;
+		}
+	}
+
+	return true;
 }
 
 /**

@@ -133,6 +133,51 @@ class RestaurantController extends ClientController {
 
         get_zx_userid($jump_url);// 调用卓效获取用户user_id接口，会判断是否在微信打开
     }
+
+
+
+
+// *******************提供查询餐厅状态接口
+
+    /**
+     * <interface>,获取餐厅营业状态
+     * 需要数据：r_ID
+     * 成功，返回餐厅营业状态
+     * 失败，返回"错误代码+错误提示"
+     */
+    function getStatus(){
+
+        $r_ID = I('post.r_ID');
+        // $r_ID = 30000;
+        $an_rst = M('restaurant')->find($r_ID);
+        // p($an_rst);die;
+
+        if (!$an_rst) {
+            
+            $data['errcode'] = '46002';
+            $data['errmsg'] = '不存在的餐厅'
+
+        }else {
+
+            $data['result'] = get_open_status($an_rst);
+        }
+        // p($data);die;
+
+        // 46001，不存在的用户
+        // 46002，不存在的餐厅
+        // 46003，不存在的菜单
+
+        // 如果是app来的访问，返回json
+        if (I('get.srcid') == '10086') {
+            
+            $JSON = $data;
+
+            echo json_encode($JSON, JSON_UNESCAPED_UNICODE); 
+            return;
+        }
+
+        $this->ajaxReturn($data, 'json');
+    }
 }
 
 ?>
