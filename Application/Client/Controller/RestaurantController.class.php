@@ -155,17 +155,18 @@ class RestaurantController extends ClientController {
         if (!$an_rst) {
             
             $data['errcode'] = '46002';
-            $data['errmsg'] = '不存在的餐厅'
+            $data['errmsg'] = '不存在的餐厅';
 
         }else {
 
-            $data['result'] = get_open_status($an_rst);
+            $data['result'] = get_format_open_status($an_rst);
         }
         // p($data);die;
 
         // 46001，不存在的用户
         // 46002，不存在的餐厅
         // 46003，不存在的菜单
+        // 46004，不存在的订单
 
         // 如果是app来的访问，返回json
         if (I('get.srcid') == '10086') {

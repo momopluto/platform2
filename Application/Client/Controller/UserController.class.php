@@ -11,15 +11,18 @@ class UserController extends Controller {
 	 * <interface>,客户注册
 	 * 需要数据：phone, name
 	 * 成功，返回client_ID
-	 * 失败，返回errcode=40001，`相关的错误信息`
+	 * 失败，返回errcode=40001，注册失败:`相关的错误信息`
 	 */
 	function reg(){
 
-		echo "reg can work!";
+		// echo "reg can work!";
 
 		// phone, name
 		$reg_data['phone'] = I('post.phone');
 		$reg_data['name'] = I('post.name');
+
+		// $reg_data['phone'] = '18826481052';
+		// $reg_data['name'] = 'momo';
 
 		$model = D('Client');
 		if ($model->create($reg_data) && $client_ID = $model->add()) {
@@ -28,7 +31,7 @@ class UserController extends Controller {
 		}else {
 
 			$data['errcode'] = '40001';
-			$data['errmsg'] = $model->getError();
+			$data['errmsg'] = '注册失败:' . $model->getError();
 		}
 
 		// 如果是app来的访问，返回json
@@ -51,11 +54,12 @@ class UserController extends Controller {
 	 */
 	function login(){
 
-		echo "login can work!";
+		// echo "login can work!";
 
 		// phone
 		// 写session
 		$map['phone'] = I('post.phone');
+		// $map['phone'] = '18826481053';
 
 		if (!$user = M('client')->where($map)->find()) {
 			
@@ -63,7 +67,7 @@ class UserController extends Controller {
 			$data['errmsg'] = '不存在的用户';
 		}else {
 
-			$data = $user;
+			$data = $user;// 用户信息
 
 			// 写session
 			session('CLIENT_ID', $user['client_ID']);
@@ -73,9 +77,15 @@ class UserController extends Controller {
 		// 如果是app来的访问，返回json
 		if (I('get.srcid') == '10086') {
 
-		    $JSON['data'] = $data;
+		    if (!$data['errcode']) {
+		        
+		        $JSON['data'] = $data;
 
-		    echo json_encode($JSON, JSON_UNESCAPED_UNICODE); 
+		        echo json_encode($JSON, JSON_UNESCAPED_UNICODE); 
+		        return;
+		    }
+
+		    echo json_encode($data, JSON_UNESCAPED_UNICODE); 
 		    return;
 		}
 
@@ -87,6 +97,7 @@ class UserController extends Controller {
 	 */
 	function logout(){
 
+		session('CLIENT_ID', null);
 		session('C_PHONE', null);
 	}
 

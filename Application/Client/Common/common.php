@@ -29,9 +29,43 @@ function compare_last_month_sales($x, $y){
 }
 
 /**
+ * 得到格式化后(简单)的餐厅营业状态
+ * @param  Array $an_rst 餐厅信息
+ * @return int           餐厅状态：-1，餐厅不营业；0，非餐厅营业时间，但可预订；1，餐厅营业
+ */
+function get_format_open_status($an_rst){
+
+	$open_status = get_open_status($an_rst);
+
+	if($an_rst['isOpen'] == "0"){//主观，休息
+
+	    $status = -1;
+	}else{//主观，营业
+	    if(intval($an_rst['open_status']) % 10 == 4){//已过餐厅今天的所有营业时间
+	        
+	        $status = -1;
+	    }else{
+	        if($an_rst['is_bookable']){
+
+	            $status = 0;// 非营业时间，但可预订
+	        }else{
+	            if($an_rst['open_status'] == "1" || $an_rst['open_status'] == "2" || $an_rst['open_status'] == "3"){
+	                $status = 1;
+	            }else{
+	            	// 非营业时间，且不可预订
+	                $status = -1;
+	            }
+	        }
+	    } 
+	}
+
+	return $status;
+}
+
+/**
  * 得到餐厅营业状态
- * @param  array $an_rst 餐厅信息
- * @return string        餐厅状态
+ * @param  Array $an_rst 餐厅信息
+ * @return int          餐厅状态
  */
 function get_open_status($an_rst){
 

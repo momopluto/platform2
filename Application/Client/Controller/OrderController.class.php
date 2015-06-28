@@ -8,26 +8,37 @@ class OrderController extends ClientController {
      * 查询历史订单
      * 分PC和移动端处理
      */
-    function orders(){
+    function myOrder(){
 
-        echo "orders can work!";
+        // echo "orders can work!";
 
-        if (I('get.srcid') == null) {
+        if (I('get.srcid') == null) {// ***********************PC端
             
             // pc
             // 直接用session中的标识
             $data = $this->get_his_orders(session('CLIENT_ID'));
 
-            $this->assign('data',$data);
+            if (!$data['errcode']) {
+
+                $this->assign('data', $data);
+            }
+
             $this->display('order');
-        }else {
-            if (I('get.srcid') == '10086') {
+        }else {// *****************************非PC端，如：移动端
+            if (I('get.srcid') == '10086') {// 且srcid是指定的值
                 
                 // 根据post过来的client_ID
                 $data = $this->get_his_orders(I('post.client_ID'));
 
-                $JSON['data'] = $data;
-                echo json_encode($JSON, JSON_UNESCAPED_UNICODE); 
+                if (!$data['errcode']) {
+                    
+                    $JSON['data'] = $data;
+
+                    echo json_encode($JSON, JSON_UNESCAPED_UNICODE); 
+                    return;
+                }
+                
+                echo json_encode($data, JSON_UNESCAPED_UNICODE); 
             }else {
 
                 // do nothing
@@ -36,182 +47,48 @@ class OrderController extends ClientController {
         }
     }
 
-    
-    // 查询订单
-    function myOrder(){
-
-//假定给出cookie('phone')或者cookie('openid')
-// cookie('openid', 'o55gotzkfpEcJoQGXBtIKoSrairQ');
-
-        // cookie('pltf_openid', null);
-        // cookie('openid',null);
-        // cookie('c_info',null);
-        // echo I('get.user_id');
-        // p(cookie());die;
-        // echo I('get.user_id');die;
-
-        // $isWechat = is_weixin();
-        
-        if (!is_weixin()) {//非微信浏览器
-
-            get_zx_userid('');// 调用卓效获取用户user_id接口，仅为显示请在微信中打开
-        }
-
-        // 如果存在get.user_id，存入cookie，重定向1次去掉user_id
-        if ($user_id = I('get.user_id')) {
-            // echo "111";die;
-            cookie('openid', $user_id);
-            cookie('token', "gh_34b3b2e6ed7f");// *****************************此处的token最好统一定义
-
-            $model = M('orderman','admin_');
-            // 准备好用户的手机、地址信息
-            $map['openid'] = cookie('openid');
-            $c_info = $model->where($map)->field('name, phone, address')->find();
-            if (!is_null($c_info)) {
-
-                cookie('c_info', json_encode($c_info));
-            }
-
-            redirect(U("Client/Order/myOrder"));
-        }
-
-        // 不存在get.user_id，也不存在cookie('openid')，出错！重新获取用户user_id
-        if (is_null(cookie('openid'))) {
-
-            // echo "222";die;
-
-            $jump_url = U("Client/Order/myOrder");
-            $jump_url = "http://".$_SERVER['HTTP_HOST'].$jump_url;// 加上域名
-
-            get_zx_userid($jump_url);// 调用卓效获取用户user_id接口
-        }
-        
-        // 如果不存在get.user_id，但存在cookie('openid')，则已成功处理掉get.user_id，继续下一步进入选择餐厅界面即可
-        // echo "333";die;
-
-        // 即只要存在cookie('openid')，能够标识用户，才满足一切操作的前提
-
-// p(cookie());
-// die;
-
-        $has_cookie = true;
-        if(cookie('pltf_phone')){
-        // 有phone
-            $map['phone'] = cookie('pltf_phone');
-        }else{
-
-            if(cookie('openid')){
-            // 有openid
-                $whe['openid'] = cookie('openid');
-                // 在orderman中通过openid对应phone
-                $map = M('orderman','admin_')->where($whe)->field('openid')->find();
-
-                if(is_null($map)){
-                // 微信上使用，用openid过滤
-                // 确保openid存在
-                
-                    $has_cookie = false;
-                }
-                
-            }else{
-            // 没有phone 也没有openid
-                $has_cookie = false;
-            }
-
-        }
-
-        // p($map);die;
-
-
-        
-        // 得到了phone后，开始查数据
-        if($has_cookie){
-
-            $o_model = M('orderitem',' ');
-            $r_model = M('resturant','home_');
-
-            // $t_brief = $o_model->where($map)->order('cTime desc')->field('guid,cTime,rid,total,status,reason')->select();
-
-            $today = date('Y-m-d');//今日
-            $month_days = getMonth_StartAndEnd($today);//本月第1日和最后1日，数组时间戳
-            $last_month_days = getLastMonth_StartAndEnd($today);//上月第1日和最后1日，数组时间戳
-
-            // 上月底到本月底的订单
-            $t_brief = $o_model->where($map)->where("cTime between '".$last_month_days[1]."' and '".$month_days[1]."'")->order('cTime desc')->field('guid,cTime,rid,total,status,reason')->select();
-
-            if(!is_null($t_brief)){
-            // 存在订单数据
-                $rsts = $r_model->getField('rid,logo_url,rst_name');
-
-                foreach ($t_brief as $one) {
-                    $one['logo_url'] = $rsts[$one['rid']]['logo_url'];
-                    $one['rst_name'] = $rsts[$one['rid']]['rst_name'];
-                    $one['cTime'] = date('n.d H:i', $one['cTime']);
-
-                    unset($one['rid']);
-
-                    $data[] = $one;
-                    // p($one);die;
-                }
-                // p($data);die;
-                $this->assign('data',$data);
-            }
-        }
-
-        $this->display('order');
-    }
-
     // 订单详情
     function detail(){
-        
-        if(!I('get.id')){
 
-            $this->error('无效订单号');
-        }
-        $map['guid'] = I('get.id');
-
-
-
-        // $o_model = M('orderitem',' ');
-        $order = M('orderitem',' ')->where($map)->find();
-        if(!is_null($order)){
-            // p($order);die;
-
-            $r_model = M('resturant','home_');
-            $whe['rid'] = $order['rid'];
-            $rstinfo = $r_model->where($whe)->field('logo_url,rst_name,rst_phone')->find();
-
-            $brief['rid'] = 10086 * $order['rid'];//此处rid加密
-            $brief['logo_url'] = $rstinfo['logo_url'];
-            $brief['rst_name'] = $rstinfo['rst_name'];
-            $brief['cTime'] = date('Y-n-d H:i', $order['cTime']);
-            $brief['total'] = $order['total'];
-            $brief['status'] = $order['status'];
-            $brief['reason'] = $order['reason'];
-            // p($rstinfo);die;
+        if (I('get.srcid') == null) {// ***********************PC端
             
-            $data['rst_phone'] = $rstinfo['rst_phone'];
-            $data['brief'] = $brief;
+            $guid = I('get.id');
+            if($guid == null){
 
-            $o_info = json_decode($order['order_info'],true);
-            $i_count = 0;
-            foreach ($o_info['item'] as $an_item) {
-                $i_count += $an_item['count'];
+                $this->error('无效订单号！');
+                return;
             }
-            $data['count'] = $i_count;
-            $data['total'] = $order['total'];
-            $data['items'] = $o_info['item'];
-            $data['name'] = $order['name'];
-            $data['phone'] = $order['phone'];
-            $data['address'] = $order['address'];
-            $data['guid'] = $order['guid'];
-            $data['note'] = $o_info['note'];
-            // p($data);die;
-            
-            $this->assign('data', $data);
+
+            $data = $this->get_order_detail($guid);
+
+            if (!$data['errcode']) {
+                $data['r_ID'] = 10086 * $data['r_ID'];//此处rid加密
+                $this->assign('data', $data);
+            }
+
+            $this->display();
+
+        }else {// *****************************非PC端，如：移动端
+            if (I('get.srcid') == '10086') {// 且srcid是指定的值
+                
+                $guid = /*I('post.guid')*/'1803104561418490416';
+
+                $data = $this->get_order_detail($guid);
+
+                if (!$data['errcode']) {
+                    
+                    $JSON['data'] = $data;
+
+                    echo json_encode($JSON, JSON_UNESCAPED_UNICODE); 
+                    return;
+                }
+                
+                echo json_encode($data, JSON_UNESCAPED_UNICODE); 
+            }else {
+                // do nothing
+                return;
+            }
         }
-        
-    	$this->display();
     }
 
 
@@ -306,119 +183,6 @@ class OrderController extends ClientController {
     */
 
 
-    /**
-     * 最终下单
-     * 分PC和移动端处理
-     */
-    function done(){
-        
-        if (I('get.srcid') == null) {// ***********************PC端的提交请求
-
-            if(IS_POST){
-
-                $json_order = cookie('pltf2_order_cookie');
-                if(!$json_order){
-
-                    // 没有订单信息的cookie
-                    $this->error('Something Wrong！', U('Client/Restaurant/lists'));
-                }
-
-                $order = json_decode($json_order, true);
-
-                $data = $this->handle_order($order);
-
-                if ($data['result']) {// 成功写入数据库
-
-                    // 清除session和cookie
-                    session('pltf2_curRst_info', null);
-                    cookie('pltf2_curRst_info', null);
-
-                    
-                    // 以下2句代码须同时使用，且顺序不能调换
-                    cookie('pltf_order_cookie', null);// 删thinkphp中的cookie
-                    setcookie("pltf_order_cookie", "", time()-1);// 真正从浏览器中删除
-
-                    $this->display();
-                }else {
-
-                    $this->error('下单未能完成，请稍后再试！');
-                }
-
-            }else {
-
-                redirect(U('Client/Restaurant/lists'));
-                return;
-            }
-
-        }else {// *****************************非PC端，如：移动端
-            if (I('get.srcid') == '10086') {// 且srcid是指定的值
-                
-                $json_order = I('post.order');
-                $order = json_decode($json_order, true);
-
-                $data = $this->handle_order($order);
-                echo json_encode($data, JSON_UNESCAPED_UNICODE);
-            }else {
-
-                redirect(U('Client/Restaurant/lists'));
-                return;
-            }
-        }
-    }
-
-
-    // 送餐信息
-    function delivery(){
-
-
-        if(IS_POST){
-
-            if (!session('?pltf2_curRst_info')) {
-        //检错*********************************************
-                $this->error('Something Wrong！', U('Client/Restaurant/lists'));
-            }
-
-            // 获取餐厅rid，再次验证餐厅状态
-            $rst = session('pltf2_curRst_info');
-            $rst = $this->update_curRstInfo($rst['r_ID']);// 更新餐厅信息
-
-            $s_times = cut_send_times($rst);
-            $this->assign('s_times', $s_times);
-       
-            $this->display();
-            
-        }else{
-
-            redirect(U('Client/Restaurant/lists'));
-        }
-    }
-
-
-    // 购物车
-    function cart(){
-
-        if(IS_POST){
-            
-            if(is_null(cookie('pltf2_order_cookie'))){
-        //检错*********************************************
-                // echo "111";die;
-                $this->success('美食篮空空如也，快去挑选餐厅选餐吧！', U('Client/Restaurant/lists'), 3);
-            }else{
-
-                // p(cookie());die;
-
-                $rst = session('pltf2_curRst_info');
-                $rst = $this->update_curRstInfo($rst['r_ID']);// 更新餐厅信息
-
-                // echo "222";die;
-                $this->display();
-            }
-
-        }else{
-            redirect(U('Client/Restaurant/lists'));
-        }
-    }
-
 
     // 对应餐厅的菜单
     function menu(){
@@ -484,6 +248,122 @@ class OrderController extends ClientController {
             $this->display();
         }
     }
+
+    // 购物车
+    function cart(){
+
+        if(IS_POST){
+            
+            if(is_null(cookie('pltf2_order_cookie'))){
+        //检错*********************************************
+                // echo "111";die;
+                $this->success('美食篮空空如也，快去挑选餐厅选餐吧！', U('Client/Restaurant/lists'), 3);
+            }else{
+
+                // p(cookie());die;
+
+                $rst = session('pltf2_curRst_info');
+                $rst = $this->update_curRstInfo($rst['r_ID']);// 更新餐厅信息
+
+                // echo "222";die;
+                $this->display();
+            }
+
+        }else{
+            redirect(U('Client/Restaurant/lists'));
+        }
+    }
+
+    // 送餐信息
+    function delivery(){
+
+
+        if(IS_POST){
+
+            if (!session('?pltf2_curRst_info')) {
+        //检错*********************************************
+                $this->error('Something Wrong！', U('Client/Restaurant/lists'));
+            }
+
+            // 获取餐厅rid，再次验证餐厅状态
+            $rst = session('pltf2_curRst_info');
+            $rst = $this->update_curRstInfo($rst['r_ID']);// 更新餐厅信息
+
+            $s_times = cut_send_times($rst);
+            $this->assign('s_times', $s_times);
+       
+            $this->display();
+            
+        }else{
+
+            redirect(U('Client/Restaurant/lists'));
+        }
+    }
+
+
+    /**
+     * 最终下单
+     * 分PC和移动端处理
+     */
+    function done(){
+        
+        if (I('get.srcid') == null) {// ***********************PC端的提交请求
+
+            if(IS_POST){
+
+                $json_order = cookie('pltf2_order_cookie');
+                if(!$json_order){
+
+                    // 没有订单信息的cookie
+                    $this->error('Something Wrong！', U('Client/Restaurant/lists'));
+                }
+
+                $order = json_decode($json_order, true);
+
+                $data = $this->handle_order($order);
+
+                if ($data['result']) {// 成功写入数据库
+
+                    // 清除session和cookie
+                    session('pltf2_curRst_info', null);
+                    cookie('pltf2_curRst_info', null);
+
+                    
+                    // 以下2句代码须同时使用，且顺序不能调换
+                    cookie('pltf_order_cookie', null);// 删thinkphp中的cookie
+                    setcookie("pltf_order_cookie", "", time()-1);// 真正从浏览器中删除
+
+                    $this->display();
+                }else {
+
+                    $this->error('下单未能完成，请稍后再试！');
+                }
+
+            }else {
+
+                redirect(U('Client/Restaurant/lists'));
+                return;
+            }
+
+        }else {// *****************************非PC端，如：移动端
+            if (I('get.srcid') == '10086') {// 且srcid是指定的值
+                
+                $json_order = I('post.order');
+                $order = json_decode($json_order, true);
+
+                $data = $this->handle_order($order);
+                echo json_encode($data, JSON_UNESCAPED_UNICODE);
+            }else {
+
+                redirect(U('Client/Restaurant/lists'));
+                return;
+            }
+        }
+    }
+
+
+
+
 
     // 私有方法，用于获取/更新当前餐厅信息
     private function update_curRstInfo($r_ID){
@@ -702,8 +582,8 @@ class OrderController extends ClientController {
 
     /**
      * 处理订单信息
-     * @param  array $order 订单信息数组
-     * @return array        成功，返回影响的数据行数；失败，返回errcode=40035，不合法的参数
+     * @param  Array $order 订单信息数组
+     * @return Array        成功，返回影响的数据行数；失败，返回errcode=40035，不合法的参数
      */
     function handle_order($order){
 
@@ -787,7 +667,7 @@ class OrderController extends ClientController {
             $data['errmsg'] = '不合法的参数_';
         }else {
 
-            $data['result'] = $res;
+            $data['result'] = $res;// 订单ID, order_ID
         }
 
         return $data;
@@ -799,7 +679,7 @@ class OrderController extends ClientController {
     /**
      * 获取客户1个月内的历史订单
      * @param  int $client_ID 客户ID
-     * @return array          历史订单
+     * @return Array          历史订单
      */
     function get_his_orders($client_ID){
 
@@ -813,25 +693,77 @@ class OrderController extends ClientController {
         // 上月底到本月底的订单
         $t_brief = $model->where($map)->where("cTime between '"
             .date('Y-m-d H:i:s',$last_month_days[1])."' and '"
-            .date('Y-m-d H:i:s',$month_days[1])."'")->order('cTime desc')->field('guid,cTime,r_ID,total,status,reason')->select();
+            .date('Y-m-d H:i:s',$month_days[1])."'")->order('cTime desc')->field('guid,cTime,r_ID,logo_url,r_name,total,status,reason')->select();
 
-        if(!is_null($t_brief)){
+        if($t_brief){
         // 存在订单数据
 
             // 转换时间显示格式
             foreach ($t_brief as $one) {
 
-                $one['cTime'] = date('n.d H:i', strtotime($one['cTime']));
+                $one['cTime'] = date('m.d H:i', strtotime($one['cTime']));
 
                 $data[] = $one;
                 // p($one);die;
             }
             // p($data);die;
 
+        }else {
+
+            $data['errcode'] = '46010';
+            $data['errmsg'] = '一个月内没有下过单';
+        }
+
+        return $data;
+    }
+
+    /**
+     * 获取订单信息详情
+     * @param  init $guid 订单号
+     * @return Array      成功，返回订单详情；失败，返回"错误码+错误信息"
+     */
+    function get_order_detail($guid){
+
+        if ($guid == null) {
+            
+            $data['errcode'] = '40035';
+            $data['errmsg'] = '不合法的参数';
+
             return $data;
         }
 
-        return null;
+        $map['guid'] = $guid;
+        $model = D('OrderView');
+
+        $an_order = $model->where($map)->find();
+        // p($an_order);die;
+
+        if ($an_order) {
+            
+            $order_info = json_decode($an_order['order_info'],true);
+            unset($an_order['order_info']);
+
+            $an_order['note'] = $order_info['note'];
+            $an_order['deliverTime'] = $order_info['deliverTime'];
+
+            $an_order['item'] = $order_info['item'];
+            $i_count = 0;
+            foreach ($an_order['items'] as $an_item) {
+                $i_count += $an_item['count'];
+            }
+
+            $an_order['item_count'] = '' . $i_count;
+            // p($an_order);
+
+            $data = $an_order;
+
+        }else {
+
+            $data['errcode'] = '46004';
+            $data['errmsg'] = '不存在的订单';
+        }
+
+        return $data;
     }
 
 }
