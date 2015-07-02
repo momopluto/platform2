@@ -318,9 +318,11 @@ class OrderController extends ClientController {
                     $this->error('Something Wrong！', U('Client/Restaurant/lists'));
                 }
 
-                $order = json_decode($json_order, true);
+                // $order = json_decode($json_order, true);
 
-                $data = $this->handle_order($order);
+                $data = $this->handle_order($json_order);
+
+                // p($data);die;
 
                 if ($data['result']) {// 成功写入数据库
 
@@ -349,9 +351,9 @@ class OrderController extends ClientController {
             if (I('get.srcid') == '10086') {// 且srcid是指定的值
                 
                 $json_order = I('post.order');
-                $order = json_decode($json_order, true);
+                // $order = json_decode($json_order, true);
 
-                $data = $this->handle_order($order);
+                $data = $this->handle_order($json_order);
                 echo json_encode($data, JSON_UNESCAPED_UNICODE);
             }else {
 
@@ -585,7 +587,7 @@ class OrderController extends ClientController {
      * @param  Array $order 订单信息数组
      * @return Array        成功，返回影响的数据行数；失败，返回errcode=40035，不合法的参数
      */
-    function handle_order($order){
+    function handle_order($json_order){
 
         // 检验数组，确保需要用到的"键"都存在，array_key_exists(key,array)
         //      即，只能判断传过来的数据是否少了，判断不了传过来的数据是否多了
@@ -606,6 +608,9 @@ class OrderController extends ClientController {
     */
 
         // p($order);
+
+        // echo $json_order;
+        $order = json_decode($json_order, true);
 
         // 检验订单信息数组，确保需要用到的"键"都存在
         $valid = check_order_array_key_exists($order);
@@ -660,6 +665,8 @@ class OrderController extends ClientController {
 
         $model = M('orderitem');
         $res = $model->add($temp);
+
+        // p($model);
 
         if (!$res) {
             
