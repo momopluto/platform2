@@ -320,6 +320,7 @@ class OrderController extends ClientController {
 
                 // $order = json_decode($json_order, true);
 
+                // echo $json_order;die;
                 $data = $this->handle_order($json_order);
 
                 // p($data);die;
@@ -351,7 +352,13 @@ class OrderController extends ClientController {
             if (I('get.srcid') == '10086') {// 且srcid是指定的值
                 
                 $json_order = I('post.order');
-                // $order = json_decode($json_order, true);
+                // 问题确定，因为post过来的数据order字符串中的 "字符 被I方法转义为 &quot;
+                // json_decode不能将其解析为json，所以直接decode结果为null
+                
+                $json_order = str_replace ( '&quot;', '"' , $json_order );// 将I方法转义的"字符恢复
+
+                // var_dump($json_order);
+                // die;
 
                 $data = $this->handle_order($json_order);
                 echo json_encode($data, JSON_UNESCAPED_UNICODE);
