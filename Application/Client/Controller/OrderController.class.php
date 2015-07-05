@@ -71,7 +71,7 @@ class OrderController extends ClientController {
         }else {// *****************************非PC端，如：移动端
             if (I('get.srcid') == '10086') {// 且srcid是指定的值
                 
-                $guid = /*I('post.guid')*/'1803104561418490416';
+                $guid = I('post.guid') /*'1803104561418490416'*/;
 
                 $data = $this->get_order_detail($guid);
 
