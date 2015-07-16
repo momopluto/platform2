@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title><?php echo HOME_TITLE; ?></title>
+      <?php $SRC = HOME_SRC; ?>
+    <script>
+      last_url = "{$data['logo_url']}";
+    </script>
+</head>
+<body>
+    <include file= "./toolbar"/>
+  <script type="text/javascript">
+    //logo预览
+    function PreviewImage(imgFile){
+       var filextension=imgFile.value.substring(imgFile.value.lastIndexOf("."),imgFile.value.length);
+       filextension=filextension.toLowerCase();
+       if ((filextension!='.jpg')&&(filextension!='.jpeg')&&(filextension!='.png'))
+       {
+           // alert("对不起，系统仅支持标准格式的照片，请您调整格式后重新上传，谢谢 !");
+           document.getElementById("imgPreview").innerHTML = "<img id='img1' width='200px' height='200px' src='"+ last_url +"'/>";
+           imgFile.focus();
+       }
+       else
+       {
+           var path;
+           if(document.all)//IE
+           {
+               imgFile.select();
+               path = document.selection.createRange().text;
+               document.getElementById("imgPreview").innerHTML="";
+               document.getElementById("imgPreview").style.filter = "progid:DXImageTransform.Microsoft.AlphaImageLoader(enabled='true',sizingMethod='scale',src=\"" + path + "\")";//使用滤镜效果      
+           }
+           else//FF
+           {
+               path=window.URL.createObjectURL(imgFile.files[0]);// FF 7.0以上
+               //path = imgFile.files[0].getAsDataURL();// FF 3.0
+               document.getElementById("imgPreview").innerHTML = "<img id='img1' width='200px' height='200px' src='"+path+"'/>";
+               //document.getElementById("img1").src = path;
+           }
+       }
+    }
+
+    function listenTone(element){
+         var msc = '<audio autoplay="autoplay" height="0" width="0">' +'<source src="{$SRC}/audio/napos_sound.mp3" type="audio/mp3" />' +'抱歉，您的浏览器版本不支持audio标签'+'</audio>';
+         $(element).append(msc);
+    }
+    function listenPeoTone(element){
+         var msc = '<audio autoplay="autoplay" height="0" width="0">' +'<source src="{$SRC}/audio/napos_sound_pe.mp3" type="audio/mp3" />' +'抱歉，您的浏览器版本不支持audio标签'+'</audio>';
+         $(element).append(msc);
+    }
+    $(function(){
+        $(".li-restInfo").removeClass("ls-block").addClass("ls-block-click");
+    });
+  </script>
+  <div id="right-show">
+
+    
+
+    <ul id="myTab" class="nav nav-tabs">
+      
+      <foreach name="rsts" item="data" >
+      
+       <li <?php if ($key == 0) {/*默认显示第1个标签页*/
+        echo 'class="active"';
+       }?> >
+          <a href="#rst-{$data[r_ID]}" data-toggle="tab">
+             {$data['name']}
+          </a>
+       </li>
+       </foreach>
+
+    </ul>
+    
+    <div id="myTabContent" class="tab-content">
+    
+    <foreach name="rsts" item="data" >
+    <div <?php if ($key == 0) {/*默认显示第1个标签页*/
+      echo 'class="tab-pane active"';
+    }else{
+      echo 'class="tab-pane"';
+    }?>  id="rst-{$data[r_ID]}">
+
+      <div class="form_list">
+        <form action="{:U('Home/Shopmanage/set')}?id={$data['r_ID']}" method="post" enctype="multipart/form-data">
+          <div>
+            <div class="info_title"><lable><h3>餐厅logo</h3></lable></div>
+            <table>
+              <tbody>
+                <tr>
+                  <td>
+                    <div id="imgPreview">
+                      <img id="img1" src="{$data['logo_url']}" width="200" height="200" />
+                    </div>                    
+                  </td>
+                  <td> 
+                    <div class="img_select">        
+                      <input type="file" name="photo" onchange='PreviewImage(this)'/>
+                      <p>（支持jpg/jpeg/png格式，360*200/200*200大小效果最佳）</p>
+                    </div>    
+                  </td>
+                </tr>
+              </tbody>
+            </table>        
+          </div>
+          
+
+          <fieldset>
+            <div class="info_title"><label><h3>餐厅信息</h3></label></div>
+            <div class="info_content">
+              <table class="info_table">
+                <tbody> 
+                  <tr> 
+                    <td>
+                      <label for="name">餐厅名：</label>
+                    </td>
+                    <td>
+                      <input type="text" name="name" value="{$data['name']}"/>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <label for="address">餐厅地址：</label>
+                    </td>
+                    <td>
+                      <input type="text" name="address"  value="{$data['address']}"/>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <label for="desc">餐厅简介：</label>
+                    </td>
+                    <td>
+                      <div>
+                        <input type="text" name="desc" title="填写餐厅介绍，不要超过25个字" value="{$data['desc']}">
+                      </div>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <label for="phone">联系电话：</label>
+                    </td>
+                    <td>
+                      <div>
+                        <input type="text" name="phone" title="请填写最常用的电话号码" value="{$data['phone']}">
+                      </div>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <label for="promotion_info">餐厅公告信息（促销信息）：</label>
+                    </td>
+                    <td>
+                      <div>
+                        <textarea rows="4" cols="30" name="promotion_info">{$data['promotion_info']}</textarea>
+                      </div>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </fieldset>
+
+          <fieldset>
+            <div class="info_title"><label><h3>订餐设置</h3></label></div>
+            <div class="info_content">
+              <table class="info_table">
+                <tbody>
+                  <tr>
+                    <td>
+                      <label for="agent_fee">起送价（元）[目前暂不分区域]：</label>
+                    </td>
+                    <td>
+                      <div>
+                        <input type="text" name="agent_fee" title="订单起送价[目前暂不分区域]" value="{$data['agent_fee']}">
+                      </div>
+                    </td>
+                  </tr>
+                   <tr>
+                    <td>
+                      <label for="deliver_desc">起送说明：</label>
+                    </td>
+                    <td>
+                      <div>
+                        <input type="text" name="deliver_desc" value="{$data['deliver_desc']}">
+                      </div>
+                    </td>
+                  </tr>
+                   <tr>
+                    <td>
+                      <label for="is_bookable">是否接受预定：</label>
+                    </td>
+                    <td>
+                      <div>
+                        <input type="checkbox" name="is_bookable" <if condition="$data['is_bookable'] == 1">checked="checked"</if>>
+                        <label for="is_bookable">接受预定</label>
+                      </div>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </fieldset>
+
+          <fieldset>
+            <div class="info_title"><label><h3>营业时间</h3></label></div>
+            <div class="info_content">
+              <table class="info_table">
+                <tbody>
+                  <tr>
+                    <td>
+                      <label for="restaurant_open_at">第一营业时间：</label>
+                    </td>
+                    <td>
+                      <div>
+                        <input type="time" name="time_1_open" value="{$data['time_1_open']}">
+                        -
+                        <input type="time" name="time_1_close" value="{$data['time_1_close']}">
+                      </div>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <label for="restaurant_close_at">第二营业时间：</label>
+                    </td>
+                    <td>
+                      <div>
+                        <input type="time" name="time_2_open" value="{$data['time_2_open']}">
+                        -
+                        <input type="time" name="time_2_close" value="{$data['time_2_close']}">
+                      </div>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <label for="restaurant_open_at_1">第三营业时间：</label>
+                    </td>
+                    <td>
+                      <div>
+                        <input type="time" name="time_3_open" value="{$data['time_3_open']}">
+                        -
+                        <input type="time" name="time_3_close" value="{$data['time_3_close']}">
+                      </div>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </fieldset>
+
+          <fieldset>
+            <div class="info_title"><label><h3>提示音设置</h3></label></div>
+            <div class="info_content">
+              <table class="info_table">
+                <tbody>
+                  <tr>
+                    <td>
+                      <!-- <span id="play_0" style="display: inline-block; margin-top: 8px; cursor: pointer;">[播放]</span> -->
+                       <label for="warning_people_tone" style="width: 100px;">带人声的提示音</label>
+                    </td>
+                    <td>
+                      <div>             
+                        <input id="warning_people_tone" type="radio" name="warning_tone" value="0" <if condition="$data['warning_tone'] == 0">checked="checked"</if>>
+                      </div>
+                    </td>
+                    <td>
+                        <input type="button" class="but_operate" value="试听"  onclick="listenPeoTone(this)">
+                    </td>
+                  </tr>
+                   <tr>
+                    <td>
+                       <!-- <span id="play_1" style="display: inline-block; margin-top: 8px; cursor: pointer;">[播放]</span> -->
+                       <label for="warning_pure_tone" style="width: 100px;">纯提示音</label>
+                    </td>
+                    <td>
+                      <div>
+                        <input id="warning_pure_tone" type="radio" name="warning_tone" value="1" <if condition="$data['warning_tone'] == 1">checked="checked"</if>>
+                      </div>
+                    </td>
+                    <td>
+                        <input type="button" class="but_operate" value="试听" onclick="listenTone(this)">
+                  </tr>
+                   <tr>
+                    <td>
+                    </td>
+                    <td>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </fieldset>
+
+          <div class="bottom_but_submit">
+             <!-- <a class="button success" id="restaurantEditInfoBtn">保存</a> -->
+                      <button class="but_global" type="submit">保存</button>
+          </div>
+          <div class="clear"></div>
+        </form>
+      </div>
+    </div>
+    </foreach>
+
+    </div>
+
+  </div>
+
+</body>
+</html>

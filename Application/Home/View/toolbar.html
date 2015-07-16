@@ -1,0 +1,131 @@
+    <?php $SRC = HOME_SRC; ?>
+    <link rel="stylesheet" type="text/css" href="{$SRC}/css/bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="{$SRC}/css/stylesheet.css">
+    <script type="text/javascript" src="{$SRC}/scripts/jquery.min.js"></script>
+    <script type="text/javascript" src="{$SRC}/scripts/bootstrap.min.js"></script>
+    <script type="text/javascript" src="{$SRC}/scripts/common.js"></script>
+    <script type="text/javascript">
+        // 监控新订单接口
+        var Monitor_url="{:U('Home/Orderitem/monitor')}";
+        // 获取用户历史订单接口
+        var HisOrder_URL = "{:U('Home/orderitem/getHisOrder')}";
+        // 设为无效接口
+        var Invalid_URL="{:U('Home/Orderitem/setInvalid')}";
+        
+        $(document).ready(function() {
+            //alert(ordercheck_url);
+            timedCount();
+        });
+        
+        /*轮询是否有新订单*/
+        function timedCount(){
+            $.ajax({
+                url: Monitor_url,
+                type: 'post',
+                // data:{
+                //
+                //     },
+                dataType: 'json',
+                success: function(data) {
+
+                    var arr = data;
+                    // console.log(arr);
+                    var flag = 0;
+                    for (one_rst in arr)
+                    {
+                        // console.log(arr[one_rst]);
+                        flag += parseInt(arr[one_rst]['count']);
+                    }
+
+                    // alert(flag);
+
+                    if(flag>0)
+                    {
+                        $(".new_order_bubble").css("display","block");
+                        var new_order_href="{:U('Home/Orderitem/newOrders')}";
+                        var str = '';
+                        if(!$(".new_order_bubble").is(':has(p)')) //不重复添加
+                        {
+
+                            for (one_rst in arr)
+                            {
+                                if (str != '') {
+                                    str += '<br/>';
+                                }
+                                
+                                str += '<span class="left-rstname">'+arr[one_rst]['name']+'</span>'
+                                 + '<span class="right-content">☞ 有 <span class="count" id="count-' + one_rst + '">'+ arr[one_rst]['count'] + '</span> 张新订单</span>'
+                                // str += arr[one_rst]['name'] + "☞ 有<span id=count-" + one_rst + ">"+arr[one_rst]['count']+"</span>张新订单";
+                            }
+
+                            // alert(str);
+
+                            var $p=$('<p></p>').append(str).addClass("newOrder_text");
+                            $(".new_order_bubble").append($p);
+                            // console.log($p.text());
+                            //提示音
+                            var msc = '<audio autoplay="autoplay" hidden="hidden" loop="2" height="0" width="0">' +
+                            '<source src="{$SRC}/audio/test.mp3" type="audio/mp3" />' +'</audio>';
+                            //  '<source src="/think/Huangxiaoji/Source/Audio/napos_sound.mp3" type="audio/ogg" />' +
+                            // '<embed height="0" width="0" src="/think/Huangxiaoji/Source/Audio/napos_sound.mp3" />' +
+                            $(".new_order_bubble").append(msc);
+                        }
+                        // console.log(str);
+                        for(one_rst in arr){/* 设置新订单数*/
+
+                            $("span#count-" + one_rst).html(arr[one_rst]['count']);
+                            // alert('成功没？');
+                        }
+                        $(".new_order_bubble").fadeIn().fadeOut().fadeIn().fadeOut().fadeIn();
+                    }
+                    else
+                    {
+                        $(".new_order_bubble").css("display","none"); 
+                    }
+                }
+            })
+
+        }
+
+        setInterval('timedCount()',10000);
+    </script>
+
+    <div id="header">
+    	<p>已登录</p>
+        <a class="quit" href="{:U('Home/Home/quit')}" >退出</a>
+        <a class="modify_pw" href="{:U('Home/User/change_psw')}" >修改密码</a>
+        <?php $RST_INFO = session('RST_INFO');?>
+        <foreach name="RST_INFO" item="ONE_RST" key="RID">
+            <a class="change_status" href="{:U('Home/Index/changeStatus')}?rid={$RID}">
+                {$ONE_RST['name']}
+                <?php if ($ONE_RST['isOpen'] == 1) {
+                    echo "营业中";
+                }else{
+                    echo "休息ing";
+                }?>
+            </a>
+        </foreach>
+    </div>
+
+    <div id="left-show">
+        <div class="new_order_bubble"  onclick="window.location='{:U('Home/Orderitem/newOrders')}'">
+            <div class="triangle_white"></div>
+            <div class="triangle_orange"></div>
+        </div>
+        <ul>
+        <li class="ls-block li-newOrder">
+            <a href="{:U('Home/Orderitem/newOrders')}" >新订单</a>
+        </li>
+        <li class="ls-block li-orderManage">
+            <a href="{:U('Home/Orderitem/lists')}" >订单管理</a>
+        </li>
+        <li class="ls-block li-restInfo">
+            <a href="{:U('Home/Shopmanage/set')}" >餐厅信息</a>
+        </li>
+        <li class="ls-block li-menuManage">
+            <a href="{:U('Home/Menu/lists')}" >菜单管理</a>   
+        </li>       
+    </ul>
+    </div>
+    
+    

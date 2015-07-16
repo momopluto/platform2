@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title><?php echo HOME_TITLE; ?></title>
+    <!-- JS轮询，提醒新订单 -->
+    
+</head>
+<body>
+    <include file= "./toolbar"/>
+<div id="right-show">
+
+    <ul id="myTab" class="nav nav-tabs">
+      
+      <?php $i = 0;?>
+      <foreach name="data" item="one_data" key="rid">
+      
+       <li <?php if ($i == 0) {/*默认显示第1个标签页*/
+        echo 'class="active"';
+        $i++;
+       }?> >
+          <a href="#rst-{$rid}" data-toggle="tab">
+             {$one_data['name']}
+          </a>
+       </li>
+       </foreach>
+
+    </ul>
+    
+  <div id="myTabContent" class="tab-content">
+    
+    <?php $i = 0;?>
+    <foreach name="data" item="one_data" key="rid">
+      <div <?php if ($i == 0) {/*默认显示第1个标签页*/
+        echo 'class="tab-pane active"';
+        $i++;
+      }else{
+        echo 'class="tab-pane"';
+      }?>  id="rst-{$rid}">
+
+        <div class="form_list">
+
+                <div class="info_title">
+                    <h3>新订单...</h3>
+                    <input value="newOrderPage" class="new_order_page" style="display:none">
+                </div>
+       
+            <div id="list_panel">
+
+                <!-- <div class="order_filter_summary">
+                    <div class="re_page2">            
+                        {$page}
+                    </div>
+                </div> -->
+
+              <div id="list_container">
+                  <ul id="list_items">
+                      <foreach name="one_data[orders]" item="one_order" key="sort">
+                          <div class="info_query_content">
+                              <li orderid="{$one_order['guid']}" categoryid="1" id="list-{$one_order['guid']}" class="processed" createdat="{$one_order['cTime']}" online-pay="">
+
+                                  <div class="list_order_head">
+                                      <span class="process_num">{$sort}</span><!-- 当天第xx订单 -->
+                                      <table class="item_table">
+                                          <thead>
+                                              <tr>
+                                                  <th>
+                                                      <span>订单号</span>
+                                                  </th>
+                                                   <th>
+                                                      <span>下单时间</span>
+                                                  </th>
+                                                   <th>
+                                                      <span>订单总额</span>
+                                                  </th>
+                                                   <th>
+                                                       <span>顾客电话</span>
+                                                  </th>
+                                                   <th>
+                                                      <span>顾客地址</span>
+                                                  </th>
+                                                   <th>
+                                                       <span class="info_name">订单备注</span>
+                                                  </th>
+                                              </tr>
+
+                                          </thead>
+                                          <tbody align="center">
+                                              <tr>
+                                                  <td>
+                                                      <span>{$one_order['guid']}</span>
+                                                  </td>
+                                                  <td>
+                                                      <span>{$one_order['cTime']}</span>
+                                                  </td>
+                                                  <td>
+                                                      <span>{$one_order['total']}元</span>
+                                                  </td>
+                                                  <td>
+                                                      <span>{$one_order['phone']}</span>
+                                                  </td>
+                                                  <td>
+                                                       <span>{$one_order['address']}</span>
+                                                  </td>
+                                                  <td>
+                                                       <span>{$one_order['order_info']['note']}</span>
+                                                  </td>
+                                              </tr>
+                                          </tbody>
+                                      </table>               
+                                  </div>
+         
+
+                                  <div class="list_content">
+              
+                                      <div>
+                                        <if condition="$one_order['isNewer'] == 1">
+                                      <!-- ************************新用户，提醒餐厅核实手机号（框住，突出提醒）************************** -->
+                                              <p style="color:green">此手机号码首次在平台下单，建议致电核实！</p>
+                                          <else/>
+                                              <a class="clientHisOrder" phone="{$one_order['phone']}" rid="{$rid}" id={$one_order['client_ID']}>顾客订单记录</a>
+                                        </if> 
+                                      </div>
+
+                                      <table class="item_table">
+                                          <thead>
+                                          <tr>
+                                              <th>订单篮</th>
+                                              <th>单价</th>
+                                              <th>数量</th>
+                                              <th>总价</th>
+                                          </tr>
+                                          </thead>
+                                          <tbody align="center">
+                                          <?php $items = $one_order['order_info']['item'];?>
+                                          <foreach name="items" item="one_item">
+                                              <tr>
+                                                  <td><span class="dishname">{$one_item['name']}</span></td>
+                                                  <td>{$one_item['price']}</td>
+                                                  <td>{$one_item['count']}</td>
+                                                  <td><?php echo $item_total_price = $one_item['price']*$one_item['count'];?></td>
+                                              </tr>
+                                          </foreach>                    
+                                          </tbody>
+                                          <tfoot>
+                                          <tr>
+                                              <th colspan="3">小计</th>
+                                              <th>{$one_order['order_info']['total']}</th>
+                                          </tr>
+                                          </tfoot>
+                                      </table>
+                                  </div>
+
+                                  <div class="button_container">
+
+                                      <!-- 如果是无效订单，则不显示打印按键 -->
+                                      <a href="#" orderid="{$one_order['guid']}"><button class="but_operate" type="button">打印</button></a>
+                                      <a href="{:U('Home/Orderitem/confirm')}?guid={$one_order['guid']}&rid={$rid}" orderid="{$one_order['guid']}"><button class="but_operate" type="button">确认</button></a>
+                                      <a class="get-guid" guid="{$one_order['guid']}" rid="{$rid}"><button class="but_operate btn-3" type="button">无效</button></a>
+                                  </div>
+
+                              </li>
+                              <hr>
+                          </div>
+                      </foreach>
+                  </ul>
+              </div>
+
+                <!-- <div class="re_page2">
+                    {$page}
+                </div> -->
+
+            </div>
+        </div>
+      </div>
+    </foreach>
+  </div>
+</div>
+
+  <div class="modal" id="clientHisOrder-modal" style="top:40px;">
+      <div class="modal-dialog">
+          <div class="modal-content">
+          <div class="modal-header">
+          <h4 class="modal-title">顾客订单记录</h4>
+        </div>
+        <div class="modal-body">
+
+          <div scrolltop="0" scrollleft="0">
+            <div>
+              <h2>用户 <span id="client-phone"></span> 最近一个月的订单</h2>
+              <div id="sf_admin_container">
+                <div id="sf_admin_content">
+                  <div class="sf_admin_list">
+                    <div>
+                        <table class="box" border="1" class="orders_list_table user_info_orders_table">
+                          <thead>
+                            <tr>
+                            <th width="10%">时间</th>
+                            <th width="10%">订单金额</th>
+                            <th width="20%">订单明细</th>
+                            <th width="10%">地址</th>
+                            <th width="10%">联系电话</th>
+                            </tr>
+                          </thead>
+                          <tbody align="center" class="orders_data">
+                              <tr></tr>  
+                          </tbody>
+                        </table>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+        <div class="modal-footer">
+          <!-- <button type="button" class="but_operate btn-3" data-dismiss="modal">返回</button>
+          <button type="button" class="but_operate btn-3 setInvalid">设为无效</button> -->
+        </div>
+      </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+  </div><!-- /.modal -->
+
+  <div class="modal" id="setInvalid-modal">
+      <div class="modal-dialog">
+          <div class="modal-content">
+          <div class="modal-header">
+          <h4 class="modal-title">无效原因：</h4>
+        </div>
+        <div class="modal-body">
+          <select class="Invalid_reason" name="reason">
+              <option value=null>请选择一个无效的原因</option><!-- 选中此时，不允许提交 -->
+              <option value="假订单">假订单</option>
+              <option value="重复订单">重复订单</option>
+              <option value="联系不上用户">联系不上用户</option>
+              <option value="美食已售完">美食已售完</option>
+              <option value="餐厅已打烊">餐厅已打烊</option>
+              <option value="不在配送范围">不在配送范围</option>
+              <option value="餐厅太忙">餐厅太忙</option>
+              <option value="else">其它</option><!-- 选中此时，显示文本输入框 -->
+          </select>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="but_operate btn-3" data-dismiss="modal">返回</button>
+          <button type="button" class="but_operate btn-3 setInvalid">设为无效</button>
+        </div>
+      </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+  </div><!-- /.modal -->
+
+
+<script type="text/javascript">
+
+  $(function(){
+       $(".li-newOrder").removeClass("ls-block").addClass("ls-block-click");
+  });
+
+</script>
+  
+</body>
+</html>
