@@ -3,9 +3,6 @@
 <head>
     <title><?php echo HOME_TITLE; ?></title>
       <?php $SRC = HOME_SRC; ?>
-    <script>
-      last_url = "{$data['logo_url']}";
-    </script>
 </head>
 <body>
     <include file= "./toolbar"/>
@@ -40,12 +37,12 @@
        }
     }
 
-    function listenTone(element){
-         var msc = '<audio autoplay="autoplay" height="0" width="0">' +'<source src="{$SRC}/audio/napos_sound.mp3" type="audio/mp3" />' +'抱歉，您的浏览器版本不支持audio标签'+'</audio>';
+    function listen_0_Tone(element){
+         var msc = '<audio autoplay="autoplay" height="0" width="0">' +'<source src="{$SRC}/audio/_0.mp3" type="audio/mp3" />' +'抱歉，您的浏览器版本不支持audio标签'+'</audio>';
          $(element).append(msc);
     }
-    function listenPeoTone(element){
-         var msc = '<audio autoplay="autoplay" height="0" width="0">' +'<source src="{$SRC}/audio/napos_sound_pe.mp3" type="audio/mp3" />' +'抱歉，您的浏览器版本不支持audio标签'+'</audio>';
+    function listen_1_Tone(element){
+         var msc = '<audio autoplay="autoplay" height="0" width="0">' +'<source src="{$SRC}/audio/_1.mp3" type="audio/mp3" />' +'抱歉，您的浏览器版本不支持audio标签'+'</audio>';
          $(element).append(msc);
     }
     $(function(){
@@ -90,6 +87,15 @@
                   <td>
                     <div id="imgPreview">
                       <img id="img1" src="{$data['logo_url']}" width="200" height="200" />
+                      <script>
+                        var last_url = "{$data['logo_url']}";
+                        /*
+                        多餐厅时，如果1.选择了其它照片准备，2.再打开选择图片文件框，3.按取消; 无法恢复为原来图片
+                        因为last_url已经固定记录了最后1家餐厅的logo_url
+
+                        通过前端，设置标签属性可解决
+                        */
+                      </script>
                     </div>                    
                   </td>
                   <td> 
@@ -263,7 +269,7 @@
                       </div>
                     </td>
                     <td>
-                        <input type="button" class="but_operate" value="试听"  onclick="listenPeoTone(this)">
+                        <input type="button" class="but_operate" value="试听"  onclick="listen_0_Tone(this)">
                     </td>
                   </tr>
                    <tr>
@@ -277,7 +283,7 @@
                       </div>
                     </td>
                     <td>
-                        <input type="button" class="but_operate" value="试听" onclick="listenTone(this)">
+                        <input type="button" class="but_operate" value="试听" onclick="listen_1_Tone(this)">
                   </tr>
                    <tr>
                     <td>
