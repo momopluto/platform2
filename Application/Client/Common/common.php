@@ -334,6 +334,7 @@ function get_client_ID($order){
 
 	if ($one) {
 		// 已注册
+		session('CLIENT_ID', $one['client_ID']);// PC端查询订单需要用到client_ID
 		return $one['client_ID'];
 	}else{
 		//未注册
@@ -362,9 +363,54 @@ function get_client_ID($order){
 				return false;
 			}
 			
+			session('CLIENT_ID', $client_ID);// PC端查询订单需要用到client_ID
 			return $client_ID;
 		}
 	}
+}
+
+
+/**
+ * 获取客户1个月内的历史订单
+ * @param  int $client_ID 客户ID
+ * @return Array          历史订单
+ */
+function get_his_orders($client_ID){
+
+    $map['client_ID'] = $client_ID;
+    $model = D('OrderView');
+
+    $today = date('Y-m-d');//今日
+    $month_days = getMonth_StartAndEnd($today);//本月第1日和最后1日，数组时间戳
+    $last_month_days = getLastMonth_StartAndEnd($today);//上月第1日和最后1日，数组时间戳
+
+    // 上月底到本月底的订单
+    $t_brief = $model->where($map)->where("DATE_FORMAT(cTime,'%Y-%m-%d') between '"
+        .date('Y-m-d',$last_month_days[1])."' and '"
+        .date('Y-m-d',$month_days[1])."'")->order('cTime desc')->field('guid,cTime,r_ID,logo_url,r_name,total,status,reason')->select();
+
+    // p($model);
+
+    if($t_brief){
+    // 存在订单数据
+
+        // 转换时间显示格式
+        foreach ($t_brief as $one) {
+
+            $one['cTime'] = date('m.d H:i', strtotime($one['cTime']));
+
+            $data[] = $one;
+            // p($one);die;
+        }
+        // p($data);die;
+
+    }else {
+
+        $data['errcode'] = '46010';
+        $data['errmsg'] = '一个月内没有下过单';
+    }
+
+    return $data;
 }
 
 

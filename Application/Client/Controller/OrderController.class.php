@@ -12,11 +12,17 @@ class OrderController extends ClientController {
 
         // echo "orders can work!";
 
+        // p(session());
+        // p(cookie());
+        // die;
+
         if (I('get.srcid') == null) {// ***********************PC端
             
             // pc
             // 直接用session中的标识
-            $data = $this->get_his_orders(session('CLIENT_ID'));
+            $data = get_his_orders(session('CLIENT_ID'));
+
+            // p($data);die;
 
             if (!$data['errcode']) {
 
@@ -28,7 +34,7 @@ class OrderController extends ClientController {
             if (I('get.srcid') == '10086') {// 且srcid是指定的值
                 
                 // 根据post过来的client_ID
-                $data = $this->get_his_orders(I('post.client_ID'));
+                $data = get_his_orders(I('post.client_ID'));
 
                 if (!$data['errcode']) {
                     
@@ -187,6 +193,8 @@ class OrderController extends ClientController {
     // 对应餐厅的菜单
     function menu(){
 
+        // p(cookie());die;
+
         if (IS_POST) {
 
             // p(I('post.'));die;
@@ -318,9 +326,6 @@ class OrderController extends ClientController {
                     $this->error('Something Wrong！', U('Client/Restaurant/lists'));
                 }
 
-                // $order = json_decode($json_order, true);
-
-                // echo $json_order;die;
                 $data = $this->handle_order($json_order);
 
                 // p($data);die;
@@ -331,10 +336,17 @@ class OrderController extends ClientController {
                     session('pltf2_curRst_info', null);
                     cookie('pltf2_curRst_info', null);
 
-                    
                     // 以下2句代码须同时使用，且顺序不能调换
-                    cookie('pltf_order_cookie', null);// 删thinkphp中的cookie
-                    setcookie("pltf_order_cookie", "", time()-1);// 真正从浏览器中删除
+                    cookie('pltf2_order_cookie', null);// 删thinkphp中的cookie
+                    setcookie("pltf2_order_cookie", "", time()-1);// 真正从浏览器中删除
+
+                    // PC端，用cookie保存用户的送餐信息
+                    $order = json_decode($json_order, true);
+                    $c_info['name'] = $order['c_name'];
+                    $c_info['phone'] = $order['c_phone'];
+                    $c_info['address'] = $order['c_address'];
+
+                    cookie('C_INFO', json_encode($c_info), 36000000);
 
                     $this->display();
                 }else {
@@ -691,47 +703,6 @@ class OrderController extends ClientController {
     }
 
     /**
-     * 获取客户1个月内的历史订单
-     * @param  int $client_ID 客户ID
-     * @return Array          历史订单
-     */
-    function get_his_orders($client_ID){
-
-        $map['client_ID'] = $client_ID;
-        $model = D('OrderView');
-
-        $today = date('Y-m-d');//今日
-        $month_days = getMonth_StartAndEnd($today);//本月第1日和最后1日，数组时间戳
-        $last_month_days = getLastMonth_StartAndEnd($today);//上月第1日和最后1日，数组时间戳
-
-        // 上月底到本月底的订单
-        $t_brief = $model->where($map)->where("cTime between '"
-            .date('Y-m-d H:i:s',$last_month_days[1])."' and '"
-            .date('Y-m-d H:i:s',$month_days[1])."'")->order('cTime desc')->field('guid,cTime,r_ID,logo_url,r_name,total,status,reason')->select();
-
-        if($t_brief){
-        // 存在订单数据
-
-            // 转换时间显示格式
-            foreach ($t_brief as $one) {
-
-                $one['cTime'] = date('m.d H:i', strtotime($one['cTime']));
-
-                $data[] = $one;
-                // p($one);die;
-            }
-            // p($data);die;
-
-        }else {
-
-            $data['errcode'] = '46010';
-            $data['errmsg'] = '一个月内没有下过单';
-        }
-
-        return $data;
-    }
-
-    /**
      * 获取订单信息详情
      * @param  init $guid 订单号
      * @return Array      成功，返回订单详情；失败，返回"错误码+错误信息"
@@ -762,7 +733,7 @@ class OrderController extends ClientController {
 
             $an_order['item'] = $order_info['item'];
             $i_count = 0;
-            foreach ($an_order['items'] as $an_item) {
+            foreach ($an_order['item'] as $an_item) {
                 $i_count += $an_item['count'];
             }
 

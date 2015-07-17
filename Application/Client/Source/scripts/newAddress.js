@@ -2,10 +2,9 @@ $(function() {
 
 	var flagAddress = false; //用于输入地址验证的辅助变量
 	var flagNumber = false; //用于验证号码的辅助变量
-	var flagName = false //用于验证姓名的辅助变量
-	$("#newAddressStr").text(full_address());
+	var flagName = false; //用于验证姓名的辅助变量
+	// $("#newAddressStr").text(full_address());
 	
-
 	if ($("#newAddressStr").text() != '添加送餐地址') {
 
 		if ($("#inputOne").val() != "") {
@@ -74,7 +73,7 @@ $(function() {
 
 				order_list = JSON.stringify(jsonArray);
 				// $("#postData").val(order_list);
-				alert(order_list);
+				// alert(order_list);
 
 				$.cookie("pltf2_order_cookie", order_list);
 
