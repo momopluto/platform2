@@ -44,6 +44,7 @@
                         $(".new_order_bubble").css("display","block");
                         var new_order_href="{:U('Home/Orderitem/newOrders')}";
                         var str = '';
+                        var msc = '';
                         if(!$(".new_order_bubble").is(':has(p)')) //不重复添加
                         {
 
@@ -56,19 +57,26 @@
                                 str += '<span class="left-rstname">'+arr[one_rst]['name']+'</span>'
                                  + '<span class="right-content">☞ 有 <span class="count" id="count-' + one_rst + '">'+ arr[one_rst]['count'] + '</span> 张新订单</span>'
                                 // str += arr[one_rst]['name'] + "☞ 有<span id=count-" + one_rst + ">"+arr[one_rst]['count']+"</span>张新订单";
+                                
+                                if (arr[one_rst]['count'] != 0 && msc.indexOf("_" + arr[one_rst]['warning_tone'] + ".mp3") == -1 ) {
+                                    // 餐厅新订单数不为0，而且该餐厅的提示音未包含在现在提示音里
+                                    msc += '<audio autoplay="autoplay" hidden="hidden" loop="2" height="0" width="0">' +
+                                    '<source src="{$SRC}/audio/_' + arr[one_rst]['warning_tone'] + '.mp3" type="audio/mp3" />' +'</audio>';
+                                };
                             }
 
-                            // alert(str);
+                            // alert(msc);
+                            console.log(msc);
 
                             var $p=$('<p></p>').append(str).addClass("newOrder_text");
                             $(".new_order_bubble").append($p);
                             // console.log($p.text());
                             //提示音
-                            var msc = '<audio autoplay="autoplay" hidden="hidden" loop="2" height="0" width="0">' +
-                            '<source src="{$SRC}/audio/test.mp3" type="audio/mp3" />' +'</audio>';
-                            //  '<source src="/think/Huangxiaoji/Source/Audio/napos_sound.mp3" type="audio/ogg" />' +
-                            // '<embed height="0" width="0" src="/think/Huangxiaoji/Source/Audio/napos_sound.mp3" />' +
+                            // var msc = '<audio autoplay="autoplay" hidden="hidden" loop="2" height="0" width="0">' +
+                            // '<source src="{$SRC}/audio/_' + arr[one_rst]['warning_tone'] + '.mp3" type="audio/mp3" />' +'</audio>';
+                            
                             $(".new_order_bubble").append(msc);
+                            /*这个提示音不及时，需要改进*/
                         }
                         // console.log(str);
                         for(one_rst in arr){/* 设置新订单数*/

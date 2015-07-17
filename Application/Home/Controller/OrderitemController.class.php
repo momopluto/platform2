@@ -362,19 +362,20 @@ class OrderitemController extends HomeController {
         if(IS_AJAX){
 
             $whe['home_ID'] = session('HOME_ID');
-            $r_IDs = M('restaurant')->where($whe)->getField('r_ID,name');
+            $r_IDs = M('restaurant')->where($whe)->getField('r_ID,name,warning_tone');
 
             $the_day = date('Y-m-d');
             $map['status'] = 0;// 新订单
             $model = M('orderitem');
 
-            foreach ($r_IDs as $r_ID => $name) {
+            foreach ($r_IDs as $r_ID => $value) {
 
                 $map['r_ID'] = $r_ID;
                 $count = $model->where($map)->where("DATE_FORMAT(cTime,'%Y-%m-%d')='" . $the_day . "'")->count();
 
-                $data[$r_ID]['name'] = $name;
+                $data[$r_ID]['name'] = $value['name'];
                 $data[$r_ID]['count'] = $count;
+                $data[$r_ID]['warning_tone'] = $value['warning_tone'];
             }
 
             $this->ajaxreturn($data, 'json');
