@@ -371,6 +371,108 @@ function get_client_ID($order){
 
 
 /**
+ * 处理订单信息
+ * @param  Array $order 订单信息数组
+ * @return Array        成功，返回影响的数据行数；失败，返回errcode=40035，不合法的参数
+ */
+function handle_order($json_order){
+
+    // 检验数组，确保需要用到的"键"都存在，array_key_exists(key,array)
+    //      即，只能判断传过来的数据是否少了，判断不了传过来的数据是否多了
+    //          而即使数据多了，也是被忽略不处理的，所以也OK
+    // 然后是get_client_ID()
+    // 完了组装数据写入数据库
+
+/*
+    $order['r_ID'] = 0;
+    $order['total'] = 1;
+    $order['item'] = 2;
+    $order['c_name'] = 3;
+    $order['c_address'] = 4;
+    $order['c_phone'] = 5;
+    $order['note'] = 6;
+    $order['deliverTime'] = 7;
+    $order['cTime'] = 8;
+*/
+
+    // p($order);
+
+    // echo $json_order;
+    $order = json_decode($json_order, true);
+
+    // 检验订单信息数组，确保需要用到的"键"都存在
+    $valid = check_order_array_key_exists($order);
+
+    if (!$valid) {
+        
+        $data['errcode'] = '40035';
+        $data['errmsg'] = '不合法的参数';
+
+        return $data;
+
+        // $JSON = $data;
+
+        // echo json_encode($JSON, JSON_UNESCAPED_UNICODE); 
+        // return;
+    }
+
+    // echo "键是否都存在？<br/>";
+    // dump($valid);
+    // die;
+
+
+    // ************以下为得到用户的client_ID
+    // 首先，需要明确的是，当用户能够提交数据至此方法时，
+    // 说明已经取得了有其手机号、地址、姓名，但这里不能确定该用户是否已注册
+    // 所以要做下面的工作：
+    // 检查该手机号对应的用户是否已经存在
+    //      不存在，则应先为该用户(隐性)注册，得到其client_ID
+    //      存在，得到其client_ID
+    $client_ID = get_client_ID($order);
+
+    // dump( $client_ID );
+    // die;
+
+    $r_ID = $order['r_ID'];
+    $guid = strval(1800 + mt_rand(1, 5000)).strval($r_ID).strval(NOW_TIME);//19位
+    // echo "guid = ".$guid;
+
+    $temp['guid'] = $guid;
+    $temp['r_ID'] = $r_ID;
+    $temp['client_ID'] = $client_ID;
+
+    $temp['name'] = $order['c_name'];
+    $temp['address'] = $order['c_address'];
+    $temp['phone'] = $order['c_phone'];
+    $temp['total'] = $order['total'];
+    $temp['order_info'] = $json_order;
+    $temp['cTime'] = $order['cTime'];
+
+    // p($temp);
+    // die;
+
+    $model = M('orderitem');
+    $res = $model->add($temp);
+
+    // p($model);
+
+    if (!$res) {
+        
+        $data['errcode'] = '40035';
+        $data['errmsg'] = '不合法的参数_';
+    }else {
+
+        $data['result'] = $res;// 订单ID, order_ID
+    }
+
+    return $data;
+
+    // $JSON = $data;
+    // echo json_encode($JSON, JSON_UNESCAPED_UNICODE);
+}
+
+
+/**
  * 获取客户1个月内的历史订单
  * @param  int $client_ID 客户ID
  * @return Array          历史订单
@@ -408,6 +510,57 @@ function get_his_orders($client_ID){
 
         $data['errcode'] = '46010';
         $data['errmsg'] = '一个月内没有下过单';
+    }
+
+    return $data;
+}
+
+
+
+/**
+ * 获取订单信息详情
+ * @param  init $guid 订单号
+ * @return Array      成功，返回订单详情；失败，返回"错误码+错误信息"
+ */
+function get_order_detail($guid){
+
+    if ($guid == null) {
+        
+        $data['errcode'] = '40035';
+        $data['errmsg'] = '不合法的参数';
+
+        return $data;
+    }
+
+    $map['guid'] = $guid;
+    $model = D('OrderView');
+
+    $an_order = $model->where($map)->find();
+    // p($an_order);die;
+
+    if ($an_order) {
+        
+        $order_info = json_decode($an_order['order_info'],true);
+        unset($an_order['order_info']);
+
+        $an_order['note'] = $order_info['note'];
+        $an_order['deliverTime'] = $order_info['deliverTime'];
+
+        $an_order['item'] = $order_info['item'];
+        $i_count = 0;
+        foreach ($an_order['item'] as $an_item) {
+            $i_count += $an_item['count'];
+        }
+
+        $an_order['item_count'] = '' . $i_count;
+        // p($an_order);
+
+        $data = $an_order;
+
+    }else {
+
+        $data['errcode'] = '46004';
+        $data['errmsg'] = '不存在的订单';
     }
 
     return $data;
