@@ -8,6 +8,10 @@ use Think\Model;
  */
 class UserModel extends Model {
 
+    protected $tableName = 'home_user';// 数据表名
+    protected $fields    = array('home_ID','admin_ID','username','password','reg_time','update_time','status');// 字段信息
+    protected $pk        = 'home_ID';// 主键
+
     protected $_validate = array(
         array('username','require','用户名不能为空！',1),
         array('password','require','密码不能为空！',1),
