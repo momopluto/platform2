@@ -13,7 +13,6 @@ class ShopmanageController extends HomeController{
 	function _initialize() {
         parent::_initialize ();
 
-        // $this->model = D('restaurant');
 	}
 
     // home新增餐厅

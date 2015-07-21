@@ -51,43 +51,4 @@ function getDatetime(){
 
     return date('Y-m-d H:i:s',time());
 }
-
-
-/*========================================送餐队长接口 begin===================================*/
-//订单信息detail，用于接口
-//格式：
-//小黄焖鸡米饭 1份/大黄焖鸡米饭 2份
-function _detail($an_item){
-    $menu_lists = array(//数据库对应的菜式
-        'info_1' => '小黄焖鸡米饭',
-        'info_2' => '辣小黄焖鸡米饭',
-        'info_3' => '大黄焖鸡米饭',
-        'info_4' => '辣大黄焖鸡米饭',
-    );
-    // p($menu_lists);
-    $detail = "";
-    foreach ($menu_lists as $key => $value) {
-        if($an_item[$key] != 0){
-            if($detail == ""){
-                $detail = $value." ".$an_item[$key]."份";    
-            }else{
-                $detail .= "/".$value." ".$an_item[$key]."份";    
-            }            
-        }
-    }
-
-    return $detail;
-}
-
-function send_order_to_captains($an_item){
-    $detail = _detail($an_item);
-
-    //中文字符要urlencode
-    $url_get = "http://203.195.152.141:3000/itemadd?total=" . urlencode($an_item['total']) . "&phoneUser=" . urlencode($an_item['phone']) . "&address=" . urlencode($an_item['address']) . "&detail=" . urlencode($detail) . "&idPlatform=" . urlencode($an_item['id']) . "&phoneShop=15876502162" . "&platform=weixin";
-    
-    $errtxt = _http_get($url_get);
-
-    return json_decode ( $errtxt, true );
-}
-/*=========================================送餐队长接口 end======================================*/
 ?>

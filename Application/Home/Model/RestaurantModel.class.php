@@ -19,13 +19,6 @@ class RestaurantModel extends Model {
         array('time_1_open','require','第一营业时间不能为空！',self::MUST_VALIDATE),
         array('time_1_close','require','第一营业时间不能为空！',self::MUST_VALIDATE),
     );
-
-
-
-    protected $_auto = array (
-        
-    );
-	
 }
 
 ?>

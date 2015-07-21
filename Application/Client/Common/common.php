@@ -566,18 +566,6 @@ function get_order_detail($guid){
     return $data;
 }
 
-
-// 获取卓效团队的接口得到的user_id
-function get_zx_userid($jump_url){
-
-	$aid = "608f5652accc7314abd682e8dedfba86";
-    // $jump_url = "http://192.168.1.103:8080/platform/index.php/Client/Restaurant/lists.html";
-    
-    $zx_url = "http://wx.joshell.com/" . $aid . "/jwc/open-oauth?redirect_uri=" . $jump_url;
-
-    redirect($zx_url);
-}
-
 // 判断网页是否在微信浏览器中打开
 function is_weixin(){
 

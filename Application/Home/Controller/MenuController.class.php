@@ -11,7 +11,6 @@ class MenuController extends HomeController {
     function _initialize() {
         parent::_initialize ();
 
-        // $this->model = M ('menu', $rid."_")->order('pid, sort');
     }
 
     // 菜单列表
