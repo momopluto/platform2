@@ -596,5 +596,4 @@ class OrderController extends ClientController {
 
         $this->ajaxReturn($data, 'json');
     }
-
 }
