@@ -173,16 +173,16 @@ class OrderitemController extends HomeController {
         }
 //***************************对应菜单销量、库存更新***************************
 
-        $model->startTrans();// orderitem表，开启事务
+        // $model->startTrans();// orderitem表，开启事务
         if (!$model->where($order_map)->setField($update)) {
 
-            $model->rollback();
+            // $model->rollback();
             $m_model->rollback();
 
             $this->error('确认订单失败！订单状态更新错误！');
             return;
         }else{
-            $model->commit();
+            // $model->commit();
             $m_model->commit();
 
             $this->success ( '订单确认成功！',U("Home/Orderitem/newOrders"),1);
